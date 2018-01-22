@@ -1,4 +1,3 @@
-tags：Python
 # CentOS下python开发环境部署
 
 ## Ⅰ、Python版本升级
