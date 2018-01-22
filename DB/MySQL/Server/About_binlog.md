@@ -41,6 +41,7 @@ flush binary logs;       新生成一个binlog
 show master status;      查看当前的binlog
 ```
 **tips:**
+
 ①bin.999999满了之后怎么办？，前面加1位
 ②binlog文件可能大于max_binlog_size,原因是一个事务产生的所有事件必须记录在同一个binlog中
 
@@ -258,6 +259,7 @@ Oracle增量备份还是有用的，万一page发生crash，需要把所有日�
 注意：没主键是不要扯什么row_id，binlog是server层的东西，和row_id没关系
 
 **tips:**
+
 MySQL5.6推出下面这个参数来指定scan算法可以部分解决无主键表导致的复制延迟问题，其基本思路是对于在一个ROWS EVENT中的所有前镜像收集起来，然后在一次扫描全表时，判断HASH中的每一条记录进行更新
 slave_rows_search_algorithms，默认值是table_scan，index_scan，另一个hash_scan可配，具体参考官网文档
 
