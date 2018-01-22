@@ -56,6 +56,7 @@ read_only = 1
 
 ### sql线程高可靠
 **背景：**
+
 - 如果将relay_log_info_repository设置为FILE，MySQL会把回放信息记录在一个relay-info.log 的文件中，其中包含SQL线程回放到的Relay_log_name和Relay_log_pos，以及对应的Master的Master_log_name和Master_log_pos
 ```
 +--------+    replication       +-------+
@@ -91,6 +92,7 @@ step3：
 **解决：**
 
 有人说把sync_relay_log_info设置为1就好了，其实不然
+
 - 如果该参数设置为 1，则表示每回放一个event，就写一次relay-info.log ，那写入代价很大，且性能很差
 - 设置为1后，即使性能上可以接受，还是会丢最有一次的操作，恢复起来后还是有1062的错误
 
