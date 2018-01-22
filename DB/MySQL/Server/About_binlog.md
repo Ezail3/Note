@@ -97,7 +97,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 ①End_log_pos - Pos = 每个event占用的字节数
 
-②show master status; 看到Position就是写到这么多偏移量的地方，也就是这么多个字节，也就是这个binlog文件的大小
+②show master status; Position就代表binlog写到这个偏移量的地方，也就是写了这么多字节，即当前binlog文件的大小
 
 ③每个binlog前四个字节保留，不写数据
 
