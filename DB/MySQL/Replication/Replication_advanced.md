@@ -91,7 +91,7 @@ step3：
 **解决：**
 有人说把sync_relay_log_info设置为1就好了，其实不然
 
-- 如果该参数设置为 1，则表示 每回放一个event，就写一次relay-info.log ，那写入代价很大，且性能很差
+- 如果该参数设置为 1，则表示每回放一个event，就写一次relay-info.log ，那写入代价很大，且性能很差
 - 设置为1后，即使性能上可以接受，还是会丢最有一次的操作，恢复起来后还是有1062的错误
 
 MySQL 5.6之后，我们将relay_log_info_repository设置为TABLE，relay-info将写入到mysql.slave_relay_log_info这张表中
@@ -122,6 +122,7 @@ COMMIT;
                      |master-info.log|
                      +---------------+
 ```
+
 - io线程负责接收event到relay log file，每接收到一个event会在master-info.log记录一下IO线程接收到的位置（Master_log_name和Master_log_pos）
 - sync_master_info=10000表示每接收10000个event，写一次master-info
 
@@ -146,9 +147,7 @@ io线程挂了
 
 - 设置master_info_repository = TABLE？？？
 没用的，event是写到relay log文件里的，不是数据库操作，所以写表里也没用，做不到原子性
-
 - 正确做法是配置relay_log_recovery = 1，表示当slave重启时，将所有relay log删除，通过sql线程重放的位置点去重新拉日志
-
 -  master_info_repository设置为TABLE虽然对crash-safe没有帮助，但也请设置为TABLE，这样性能会有提升(5.7bug)
 
 **tips：**
@@ -176,6 +175,7 @@ slave_parallel_workers        0表示只有1个线程，可以动态设置，但
 
 注意：5.6版本只支持基于database的并行回放，所以不能选择并行模式，有多少个库，就可以开多少个线程，每个线程回放指定的库，缺点就是只有一个库的时候就并行不了，所以说这时候的并行复制用的并不多
 ```
+
 - 5.7支持并行复制模式设置           
 ```
 slave_parallel_type
@@ -210,7 +210,6 @@ slave_preserve_commit_order=1
 
 这里的并行复制指的是SQL Thread，而非IO Thread
 Waiting for master to send event 这个State在show processlist中只有一个，即只有一个IO Thread
-
 
 ### 理解logical_clock
 这是一种基于组提交的并行复制
