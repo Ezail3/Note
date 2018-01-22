@@ -123,7 +123,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 再强调，row记录的是每条记录的情况(每次操作的每个记录记下来)，而不是sql语句
 
-## mysqlbinlog工具的使用
+## Ⅴ、mysqlbinlog工具的使用
 
 ### 解析binlog
 ```
@@ -217,7 +217,7 @@ ERROR: Could not read entry at offset 1158: Error in log format or read error.
 
 通常通过datetime找position，再来进行恢复
 
-## Ⅴ、通过mysqlbinlog恢复数据
+## Ⅵ、通过mysqlbinlog恢复数据
 ```
 mysqlbinlog binlog.00003 |mysql -S /tmp/mysql.sock -f
 -f强制跳过错误
@@ -241,7 +241,7 @@ mysqlbinlog binlog.000002 >> /tmp/statements.sql
 mysql -u root -p -e "source /tmp/statements.sql"
 ```
 
-## Ⅵ、清理binlog
+## Ⅶ、清理binlog
 这里介绍三种清理binlog的方法：
 ```
 法1：purge
@@ -261,7 +261,7 @@ expire_logs_days=N
 表示只保存N天的binlog，默认值是0，表示不删除
 ```
 
-## Ⅶ、其他相关问题
+## Ⅷ、其他相关问题
 
 ### 增量备份怎么做
 通常MySQL不做增量备份，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可
