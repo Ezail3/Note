@@ -132,15 +132,18 @@ root@localhost on  using Socket
 ### 关键点细说
 
 - start transaction with consistent snapshot
+
 事务隔离级别是rr，开始事务，并且马上创建一个read_view,所以mysqldump备份的数据是备份开始时候的数据而不是备份结束时的数据(备份了30min，整个过程实例一直可读可写，备份的是30min之前的数据而不是30min之后的数据)，位置点问题
 
 执行start transaction同时（而不是等到执行第一条sql）建立与本事务一致性读的snapshot
 
-- --single-tranaction，
+- --single-tranaction
+
 所有的数据库都是在一个事务里面读出来，而且事务隔离级别是如rr的，所以读到的数据是一致的
 一致性备份：整个备份从start transaction开始，备份所有的表，所有的表的数据都是在一个事务里面，通过select导出来
 
 - savepoint保存点（4.1还是5.0加进来的）
+
 savepoint很少用，真正用的最多就是备份的时候
 一张表备份完，会回滚到对应保存点，此时对应备份的表上面的元数据锁都释放，这时候可以这个表可以做ddl操作，否则在一个事务里，持有元数据锁，要做ddl(比如其他线程想对这里一个表创建索引)，即使备份完了也做不了，要等所有备份结束才能动
 没有savepoint就要持有整个事务时间，而不是表备份的时间
