@@ -2,7 +2,7 @@
 # binlog——逻辑复制的基础
 ---
 
-## binlog定义和作用
+## Ⅰ、binlog定义和作用
 
 ### 定义
 记录每次数据库的逻辑操作(包括表结构变更和表数据修改)
@@ -14,7 +14,7 @@
 - 备份恢复：最近逻辑备份数据+binlog实现最大可能恢复
 - innodb恢复：开启binlog的情况下，innodb事务提交是二阶段提交，发生crash的时候，innodb中事务有两种状态，一种是commit，一种是prepared，对于prepared状态的事务需要根据binlog来判断是提交还是回滚，以此来保证主从数据一致性
 
-## 不同类型binlog对比
+## Ⅱ、不同类型binlog对比
 |-|statement|row|mixed|
 |:-:|:-:|:-:|:-:|
 |说明|记录操作的SQL语句|记录每一行数据的变更|混合模式|
@@ -31,7 +31,7 @@
 
 假设更新一张几百万的表，产生的binlog可能会有几百兆，当commit时，写入的数据量就是几百兆，所以会有“阻塞”等待的效果。但其实是在写binlog到磁盘
 
-## 相关参数及使用命令
+## Ⅲ、相关参数及使用命令
 ```
 log_bin=bin              默认不打开，和oracle一样，不管事务大小，提交速度都一样)
 log_bin_basename         设置binlog名，不设置默认为机器名，直接用上面的log_bin=bin也表示二进制文件以bin开头
@@ -50,7 +50,7 @@ show master status;      查看当前的binlog
 
 ②binlog文件可能大于max_binlog_size,原因是一个事务产生的所有事件必须记录在同一个binlog中
 
-## binlog内容
+## Ⅳ、binlog内容
 
 ### index文件
 有序地记录了当前MySQL服务所使用的所用binlog文件
@@ -217,7 +217,7 @@ ERROR: Could not read entry at offset 1158: Error in log format or read error.
 
 通常通过datetime找position，再来进行恢复
 
-## 通过mysqlbinlog恢复数据
+## Ⅴ、通过mysqlbinlog恢复数据
 ```
 mysqlbinlog binlog.00003 |mysql -S /tmp/mysql.sock -f
 -f强制跳过错误
@@ -241,7 +241,7 @@ mysqlbinlog binlog.000002 >> /tmp/statements.sql
 mysql -u root -p -e "source /tmp/statements.sql"
 ```
 
-## 清理binlog
+## Ⅵ、清理binlog
 这里介绍三种清理binlog的方法：
 ```
 法1：purge
@@ -261,7 +261,7 @@ expire_logs_days=N
 表示只保存N天的binlog，默认值是0，表示不删除
 ```
 
-## 其他相关问题
+## Ⅶ、其他相关问题
 
 ### 增量备份怎么做
 通常MySQL不做增量备份，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可
