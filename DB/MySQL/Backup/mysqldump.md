@@ -166,6 +166,7 @@ mysqldump --single-transaction --master-data=1 --triggers -R -E -B sbtest | gzip
 备份校验，另行考虑
 
 ③备份文件使用
+
 mysql < xxx.sql;
 
 **tips:**
