@@ -31,7 +31,8 @@ master-data=2
 ```
 
 常用的几种：
+```
 mysqldump --single-transaction -B test a > backup.sql    备份test库和a库
 mysqldump --single-transaction test a > backup.sql       备份test库下的a表
 mysqldump --single-transaction test a -w "c=12"> backup.sql
-
+```
