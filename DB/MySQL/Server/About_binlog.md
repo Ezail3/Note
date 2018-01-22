@@ -3,6 +3,7 @@
 ---
 
 ## binlog定义和作用
+
 ### 定义
 记录每次数据库的逻辑操作(包括表结构变更和表数据修改)
 
@@ -50,6 +51,7 @@ show master status;      查看当前的binlog
 ②binlog文件可能大于max_binlog_size,原因是一个事务产生的所有事件必须记录在同一个binlog中
 
 ## binlog内容
+
 ### index文件
 有序地记录了当前MySQL服务所使用的所用binlog文件
 
@@ -122,6 +124,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 再强调，row记录的是每条记录的情况(每次操作的每个记录记下来)，而不是sql语句
 
 ## mysqlbinlog工具的使用
+
 ### 解析binlog
 ```
 1、mysqlbinlog bin.000001
@@ -259,6 +262,7 @@ expire_logs_days=N
 ```
 
 ## 其他相关问题
+
 ### 增量备份怎么做
 通常MySQL不做增量备份，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可
 Oracle增量备份还是有用的，万一page发生crash，需要把所有日志重做一遍
