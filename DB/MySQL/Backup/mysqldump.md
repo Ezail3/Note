@@ -73,20 +73,27 @@ Query OK, 0 rows affected (0.00 sec)
 
 (root@localhost) [(none)]> select argument from mysql.general_log where thread_id=239 order by event_time;
 
-FLUSH /*!40101 LOCAL */ TABLES                                                              
-FLUSH TABLES WITH READ LOCK                                                                         
-SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ                                             
-START TRANSACTION /*!40100 WITH CONSISTENT SNAPSHOT */                                              
-SHOW VARIABLES LIKE 'gtid\_mode'                                                                    
-SHOW MASTER STATUS                                                                                  
-UNLOCK TABLES                                                                                       
+FLUSH /*!40101 LOCAL */ TABLES
+# 先把表刷一把，减少ftwrl锁的等待时间
+FLUSH TABLES WITH READ LOCK
+# 把当前整个实例锁成只读
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ
+# 设置备份线程事务隔离级别为rr
+START TRANSACTION /*!40100 WITH CONSISTENT SNAPSHOT */
+# 开启事务
+SHOW VARIABLES LIKE 'gtid\_mode'                                                                     
+SHOW MASTER STATUS
+# 获得当前二进制日志位置
+UNLOCK TABLES
+# 释放实例级别的只读锁
 SELECT LOGFILE_GROUP_NAME, FILE_NAME, TOTAL_EXTENTS, INITIAL_SIZE, ENGINE, EXTRA FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'UNDO LOG' AND FILE_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IN (SELECT DISTINCT LOGFILE_GROUP_NAME FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('dump_test'))) GROUP BY LOGFILE_GROUP_NAME, FILE_NAME, ENGINE, TOTAL_EXTENTS, INITIAL_SIZE ORDER BY LOGFILE_GROUP_NAME 
 SELECT DISTINCT TABLESPACE_NAME, FILE_NAME, LOGFILE_GROUP_NAME, EXTENT_SIZE, INITIAL_SIZE, ENGINE FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('dump_test')) ORDER BY TABLESPACE_NAME, LOGFILE_GROUP_NAME                                                                 
 SHOW VARIABLES LIKE 'ndbinfo\_version'                                                              
 dump_test                                                                                           
 SHOW CREATE DATABASE IF NOT EXISTS `dump_test`                                                      
-SAVEPOINT sp                                                                                        
-show tables                                                                                         
+SAVEPOINT sp
+# 使用savepoint sp，便于回滚，用于快速释放metadata数据共享锁
+show tables                                                                                          
 show table status like 'dump\_inno'                                                                 
 SET SQL_QUOTE_SHOW_CREATE=1                                                                         
 SET SESSION character_set_results = 'binary'                                                        
@@ -99,9 +106,12 @@ SET SESSION character_set_results = 'binary'
 use `dump_test`                                                                                     
 select @@collation_database                                                                         
 SHOW TRIGGERS LIKE 'dump\_inno'                                                                     
-SET SESSION character_set_results = 'utf8'                                                          
-ROLLBACK TO SAVEPOINT sp                                                                            
-RELEASE SAVEPOINT sp  
+SET SESSION character_set_results = 'utf8'
+# 以上部分备份数据
+ROLLBACK TO SAVEPOINT sp                                                                             
+RELEASE SAVEPOINT sp
+# 回到savepoint sp，释放metadata的锁
+# 每取一张表的数据，就rollback to savepoint sp（一个savepoint就够了）
 
 root@localhost on  using Socket                                                                     
 /*!40100 SET @@SQL_MODE='' */                                                                       
