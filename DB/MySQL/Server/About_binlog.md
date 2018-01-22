@@ -55,6 +55,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 ### binlog文件
 执行show binlog events in 'xxx'；
+
 查看binlog文件内容，不指定文件默认看第一个binlog文件
 ```
 (root@localhost) [test]> show binlog events;
