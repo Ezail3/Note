@@ -17,7 +17,7 @@ single-transcation
 master-data=2
 ```
 
-### 日常选项
+### 基本选项
 只备份innodb，用不了几个参数，记住下面几个即可，其他的没什么卵用
 ```
 -A 备份所有的database
@@ -147,3 +147,23 @@ root@localhost on  using Socket
 savepoint很少用，真正用的最多就是备份的时候
 一张表备份完，会回滚到对应保存点，此时对应备份的表上面的元数据锁都释放，这时候可以这个表可以做ddl操作，否则在一个事务里，持有元数据锁，要做ddl(比如其他线程想对这里一个表创建索引)，即使备份完了也做不了，要等所有备份结束才能动
 没有savepoint就要持有整个事务时间，而不是表备份的时间
+
+## 常规操作
+
+①备份并且压缩
+
+mysqldump --single-transaction --master-data=1 --triggers -R -E -B sbtest | pv | gzip -c > sbtest.backup.tgz
+压缩过的备份恢复
+gunzip < sbtest.backup.tgz | mysql
+
+②备份并且压缩到远程服务器
+
+mysqldump --single-transaction --master-data=1 --triggers -R -E -B sbtest | gzip -c | ssh root@test-3 'cat > /tmp/sbtest.sql.gz'
+备份校验，另行考虑
+
+③备份文件使用
+mysql < xxx.sql;
+
+**tips:**
+
+备份占用带宽很大，需要调度算法确保同一个集群中同时只有一个机器做备份，或者不每天做备份从而错开备份时间
