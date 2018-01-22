@@ -15,6 +15,7 @@
 
 - 备份数据文件 ，需要停机
 - 备份datadir目录下的所有文件(只拷贝这个目录可以吗？实际undo、redo、binlog可以配置不同的目录，可能不在datadir下)
+
 特殊情况：
     create table zz(a int) data directory = '/tmp/'
 有这个情况怎么办呢？备份时候解析每个表的data directory？所以 不建议用这东西建表
