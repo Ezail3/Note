@@ -84,6 +84,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 24 rows in set (0.00 sec)
 ```
 由此可见，binlog是由各类event组成，下面看下分析下event相关内容
+
 |field|含义|
 |:-:|:-:|
 |(Log_name,Pos)|一个event开始的位置信息|
