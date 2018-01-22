@@ -86,6 +86,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 +------------+------+----------------+-----------+-------------+--------------------------------------------------+
 24 rows in set (0.00 sec)
 ```
+
 由此可见，binlog是由各类event组成，下面看下分析下event相关内容
 
 |field|含义|
@@ -189,6 +190,7 @@ binlog_format设为row，只知道变化，不知道sql语句，这咋办？
 --start-datetime='xxx-xx-xx xx:xx:xx'
 --stop-datetime='xxx-xx-xx xx:xx:xx'
 ```
+
 - 根据二进制偏移量解析
 ```
 --start-position=xxx
@@ -213,11 +215,13 @@ mysqlbinlog binlog.00003 |mysql -S /tmp/mysql.sock -f
 -f强制跳过错误
 只恢复某一段，就加上--start-position或者--start-datetime等
 ```
+
 官方文档：
 如果存在多个二进制日志，并不建议一个一个恢复，而是用下面这个方法
 ```
 mysqlbinlog binlog.[0-9]* |mysql -u root -p
 ```
+
 一个一个恢复会报danger
 说明：如果分两次操作，会被认为在两个session中操作，如果刚好用到一个临时表，一个session退出了，另一个session上去就出错了
 
