@@ -1,6 +1,5 @@
 ---
 # binlog——逻辑复制的基础
-tags：self
 ---
 
 ## binlog定义和作用
