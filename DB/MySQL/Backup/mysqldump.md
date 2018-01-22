@@ -156,7 +156,9 @@ savepoint很少用，真正用的最多就是备份的时候，一张表备份�
 ①备份并且压缩
 
 mysqldump --single-transaction --master-data=1 --triggers -R -E -B sbtest | pv | gzip -c > sbtest.backup.tgz
+
 压缩过的备份恢复
+
 gunzip < sbtest.backup.tgz | mysql
 
 ②备份并且压缩到远程服务器
