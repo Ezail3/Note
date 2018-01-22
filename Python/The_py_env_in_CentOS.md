@@ -1,7 +1,9 @@
 # CentOS下python开发环境部署
 
 ## Ⅰ、Python版本升级
+
 ### 背景：CentOS 6自带Python版本为2.6的，业内潜规则是不用2.7之前的Python,固我们有必要做一个升级
+
 ### 升级步骤：
 - 查看原版本
 ``` 
@@ -68,7 +70,9 @@ Python 2.7.3
 sed -i '1s/python/python_bak/g' /usr/bin/yum
 ```
 ## Ⅱ、关于pip
+
 ### 背景：为了便于管理第三方库，python提供了pip这个包管理工具，Python 2.7.9+和Python3.4+已经内置了pip，之前的版本需要手动部署
+
 ### 部署步骤：
 - 下载安装
 ```
@@ -126,7 +130,9 @@ ln -s  /usr/local/python27/bin/ipython /usr/bin/
 ```
 
 ## Ⅲ、vim中写python
+
 ### 背景：这里只做一个最基本的入门配置，包括插件管理器、智能提示、代码补全、语法检测、一键执行等
+
 ### 部署步骤：
 - 安装vim-plug插件管理器
 ```
