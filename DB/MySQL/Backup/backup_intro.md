@@ -49,8 +49,7 @@ redo、undo、binlog放hdd上，数据放ssd？没必要，现在ssd很便宜，
 
 **mysqldump**
 
-- 官方自带备份工具
- 开源免费
+- 官方自带备份工具 开源免费
 - 逻辑备份(速度慢)
 - 不阻塞dml，阻塞ddl
 
