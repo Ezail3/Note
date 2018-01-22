@@ -13,7 +13,7 @@
 my.cnf中配上下面配置
 ```
 [mysqldump]
-single-transcation
+single-transaction
 master-data=2
 ```
 
