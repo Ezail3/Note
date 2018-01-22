@@ -42,6 +42,7 @@ show master status;      查看当前的binlog
 ```
 
 **tips:**
+
 ①bin.999999满了之后怎么办？ 前面加1位
 ②binlog文件可能大于max_binlog_size,原因是一个事务产生的所有事件必须记录在同一个binlog中
 
