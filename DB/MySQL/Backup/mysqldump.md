@@ -162,6 +162,7 @@ gunzip < sbtest.backup.tgz | mysql
 ②备份并且压缩到远程服务器
 
 mysqldump --single-transaction --master-data=1 --triggers -R -E -B sbtest | gzip -c | ssh root@test-3 'cat > /tmp/sbtest.sql.gz'
+
 备份校验，另行考虑
 
 ③备份文件使用
