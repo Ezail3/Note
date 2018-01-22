@@ -46,3 +46,64 @@ mysqldump --single-transaction test a -w "c=12"> backup.sql
 比上面的参数力度更大，备份时将整个实例锁住
 ```
 
+## Ⅱ、mysqldump实现原理剖析
+开glog嗖哈一把看看嘛(*^__^*) 
+```
+session 1:
+(root@localhost) [(none)]> truncate mysql.general_log;
+Query OK, 0 rows affected (0.02 sec)
+
+(root@localhost) [(none)]> set global general_log = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> set global log_output = 'table';
+Query OK, 0 rows affected (0.00 sec)
+
+session 2:
+mysqldump --single-transaction --master-data=2 -B dump_test > /tmp/back.sql
+
+session 1:
+(root@localhost) [(none)]> set global general_log = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> set global log_output = 'file';
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> select thread_id,left(argument,64) from mysql.general_log;
+
+(root@localhost) [(none)]> select argument from mysql.general_log where thread_id=239 order by event_time;
+
+FLUSH /*!40101 LOCAL */ TABLES                                                              
+FLUSH TABLES WITH READ LOCK                                                                         
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ                                             
+START TRANSACTION /*!40100 WITH CONSISTENT SNAPSHOT */                                              
+SHOW VARIABLES LIKE 'gtid\_mode'                                                                    
+SHOW MASTER STATUS                                                                                  
+UNLOCK TABLES                                                                                       
+SELECT LOGFILE_GROUP_NAME, FILE_NAME, TOTAL_EXTENTS, INITIAL_SIZE, ENGINE, EXTRA FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'UNDO LOG' AND FILE_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IS NOT NULL AND LOGFILE_GROUP_NAME IN (SELECT DISTINCT LOGFILE_GROUP_NAME FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('dump_test'))) GROUP BY LOGFILE_GROUP_NAME, FILE_NAME, ENGINE, TOTAL_EXTENTS, INITIAL_SIZE ORDER BY LOGFILE_GROUP_NAME 
+SELECT DISTINCT TABLESPACE_NAME, FILE_NAME, LOGFILE_GROUP_NAME, EXTENT_SIZE, INITIAL_SIZE, ENGINE FROM INFORMATION_SCHEMA.FILES WHERE FILE_TYPE = 'DATAFILE' AND TABLESPACE_NAME IN (SELECT DISTINCT TABLESPACE_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_SCHEMA IN ('dump_test')) ORDER BY TABLESPACE_NAME, LOGFILE_GROUP_NAME                                                                 
+SHOW VARIABLES LIKE 'ndbinfo\_version'                                                              
+dump_test                                                                                           
+SHOW CREATE DATABASE IF NOT EXISTS `dump_test`                                                      
+SAVEPOINT sp                                                                                        
+show tables                                                                                         
+show table status like 'dump\_inno'                                                                 
+SET SQL_QUOTE_SHOW_CREATE=1                                                                         
+SET SESSION character_set_results = 'binary'                                                        
+show create table `dump_inno`                                                                       
+SET SESSION character_set_results = 'utf8'                                                          
+show fields from `dump_inno`                                                                        
+show fields from `dump_inno`                                                                        
+SELECT /*!40001 SQL_NO_CACHE */ * FROM `dump_inno`                                                  
+SET SESSION character_set_results = 'binary'                                                        
+use `dump_test`                                                                                     
+select @@collation_database                                                                         
+SHOW TRIGGERS LIKE 'dump\_inno'                                                                     
+SET SESSION character_set_results = 'utf8'                                                          
+ROLLBACK TO SAVEPOINT sp                                                                            
+RELEASE SAVEPOINT sp  
+
+root@localhost on  using Socket                                                                     
+/*!40100 SET @@SQL_MODE='' */                                                                       
+/*!40103 SET TIME_ZONE='+00:00' */                                                                  
+```
