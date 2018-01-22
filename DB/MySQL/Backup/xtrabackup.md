@@ -4,8 +4,8 @@
 
 ## xtrabackup介绍
 
-- xtrabackup只能备份innodb存储引擎，percona开源的，强烈推荐最新版本(旧版本bug多)
-- innobackupex可以备份多种引擎，一般用它
+- xtrabackup只能备份innodb存储引擎的数据，不能备份表结构，percona开源的，强烈推荐最新版本(旧版本bug多)
+- innobackupex可以备份多种引擎的数据和表结构，一般用这个
 - 备份时，默认读取MySQL配置文件(datadir)
 
 ## xtrabackup安装使用
