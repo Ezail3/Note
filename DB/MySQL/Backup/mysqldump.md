@@ -24,8 +24,9 @@ master-data=2
 -B 备份哪几个数据库
 -R 备份存储过程(-- routines)
 -E 备份定时任务(-- events)
--d 备份表结构
+-d 只备份表结构
 -w 备份过滤数据
+-t 只备份数据
 --triggers 备份触发器
 --master-data=2 在备份文件中以注释的形式记录备份开始时binlog的position，默认值是1，不注释
 ```
