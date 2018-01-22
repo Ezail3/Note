@@ -1,9 +1,9 @@
 ---
 # MySQL复制入门
-tags:self
 ---
 
-## 复制类型
+## Ⅰ、复制类型
+
 ### 逻辑复制
 - 记录每次逻辑操作
 - 主从数据库可以不一致
@@ -21,13 +21,16 @@ tags:self
 简单的主从环境，两边同样的表，space_id不用一样，只要保证数据在逻辑内容上一致，物理上不用一样。也就是说，一张表的数据一致就行，不要求这些数据对应的表空间里面内容也一致
 
 **Oracle的优势**
+
 Oracle中commit时间是平均的，MySQL却不是
+
 MySQL中事务越大commit越慢，binlog是事务执行完commit之后才写，从而产生延时的问题，Oracle中是物理逻辑复制，块的变化实时同步到从上
 
 **MySQL的优势**
+
 做大数据，把MySQL里面的数据变化传到数据仓库平台，MySQL做起来就很方便，Oralce做起来麻烦，物理日志要去解析是解析不出来行的变化的，但是有ogg工具可以同步到hive，不过偏商业
 
-## 典型关系型数据库复制对比
+## Ⅱ、典型关系型数据库复制对比
 |-|MySQL|Oracle Data Gurad|SQL Server Mirroring|
 |:-:|:-:|:-:|:-:|
 |类型|逻辑复制|物理逻辑复制|物理逻辑复制|
@@ -35,11 +38,12 @@ MySQL中事务越大commit越慢，binlog是事务执行完commit之后才写，
 |缺点|配置不当易出错|要求物理数据严格一致|要求物理数据严格一致|
 
 问：MySQL的innodb也有redo，那为什么不支持redo级别的复制呢？
+
 答：因为MySQL有很多种引擎，需要有一个统一的复制层，而不是在引擎层做复制，所以在server层实现复制，每个引擎做一个复制就做不到一致性了
 
 一般业务架构，一主两从足够，金融行业可能会做一主四从
 
-## 复制搭建
+## Ⅲ、复制搭建
 **小常识**
 MySQL的事务一次commit分成三个阶段
 第一阶段的prepare和第三阶段的commit都在innodb层
@@ -61,13 +65,17 @@ MySQL的事务一次commit分成三个阶段
  | binlog +--^   |relay log+-----^
  +--------+      +---------+
 ```
+
 当commit写到二进制文件之后，如果搭建了复制，就会有一个dump thread将binlog传送到远程服务器
 远端服务器上有一个IO thread来接收这些event放到relay log中，还有一个SQL thread来回放relay log中的event
 5.6版本开始，可以多个线程并行回放，所以速度相对来说可能快一些
 
 **tips：**
+
 ①关于binlog，详见[binlog——逻辑复制的基础][1]
+
 ②master发送给slave的是什么东西？具体怎么发送的？    答：以event为最小单位发送，千万不要说sql语句或者记录
+
 ③关于relay log
 
 - Relay_Log_File和Relay_Log_Pos 是中继日志（relay log）信息
@@ -84,7 +92,6 @@ MySQL的事务一次commit分成三个阶段
 |step2|从机恢复数据|
 |step3|主机授权一个复制用户权限|
 |step4|从机change master to(filename,pos)|
-
 
 - pos之前是导过来的数据，pos之后通过binlog同步，这是一个最终一致性的模型，master不断将binlog发到slave
 - binlog的恢复是手工的，MySQL的复制是准实时的
@@ -224,7 +231,7 @@ master-retry-count      重连次数
 当从库发现从主库上无法获得更多的数据了，就会等待slave-net-timeout时间，然后将IO thread置为no状态，接着开始尝试重建建立连接，每次建立失败之后等待master-connect-retry时间，一直重试master-retry-count次
 ```
 
-## 主从架构中常用的操作
+## Ⅲ、主从架构中常用的操作
 ### 主
 ```
 查看从服务器列表
@@ -281,7 +288,7 @@ Query OK, 0 row affected (0.00 sec)
 关于这个跳过当前报错后面会专门具体展开分析，暂时了解这么多即可
 ```
 
-## read_only与super_read_only
+## Ⅳ、read_only与super_read_only
 如果在slave机器上对数据库进行修改或者删除，会导致主从的不一致，需要对Slave机器设置为read_only = 1 ，让slave提供只读操作。
 
 **tips：**
