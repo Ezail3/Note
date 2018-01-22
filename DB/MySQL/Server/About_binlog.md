@@ -282,6 +282,7 @@ slave_rows_search_algorithms，默认值是table_scan，index_scan，另一个ha
 binlog默认写入binlog_cache中
 
 **binlog生成的过程**
+
 |步骤|操作|
 |:-:|:-:|
 |1|binlog被write到各session对应的文件句柄缓存中，也就是标准io缓存|
@@ -293,7 +294,6 @@ binlog默认写入binlog_cache中
 在这之前只要机器发生crash，则日志就相对应的丢失了
 
 特殊情况：遇到大事务时，binlog很大，cache放不下就会落盘
-
 ```
 (root@172.16.0.10) [(none)]> show global status like 'binlog_cache%';
 +-----------------------+-------+
