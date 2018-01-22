@@ -296,7 +296,7 @@ Query OK, 0 row affected (0.00 sec)
 
 **tips：**
 
-- read_only仅仅对没有SUPER权限的用户有效（即 mysql.user表的Super_priv字段为Y），一般给APP的权限是 不需要SUPER权限的
+- read_only仅仅对没有SUPER权限的用户有效（即 mysql.user表的Super_priv字段为Y），一般给APP的权限是不需要SUPER权限的
 - MySQL 5.7中参数super_read_only可以将有SUPER权限的用户也设置为只读，且该参数设置为ON后，read_only也跟着自动设置为ON
 - 当前MySQL中，在/etc/my.cnf中将super_read_only=1配置好后重启，还是可以插入或修改数据。需要在命令行中执行set global super_read_only=1; 才能真正修改为只读，具体何时修复还没注意
 
