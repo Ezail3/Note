@@ -47,7 +47,8 @@ mysqldump --single-transaction test a -w "c=12"> backup.sql
 ```
 
 ## Ⅱ、mysqldump实现原理剖析
-开glog嗖哈一把看看嘛(*^__^*) 
+
+### 开glog嗖哈一把看看嘛(*^__^*) 
 ```
 session 1:
 (root@localhost) [(none)]> truncate mysql.general_log;
@@ -117,3 +118,13 @@ root@localhost on  using Socket
 /*!40100 SET @@SQL_MODE='' */                                                                       
 /*!40103 SET TIME_ZONE='+00:00' */                                                                  
 ```
+
+### mysqldump流程小结
+|-|操作|解析|
+|:-:|:-:|:-:|
+|step1|flush tables/flush tables with read lock|将实例锁成只读|
+|step2|SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ/START TRANSACTION|开启rr隔离级别的事务|
+|step3|SHOW MASTER STATUS/UNLOCK TABLES|获取二进制日志位置并释放全局读锁|
+|step4|SAVEPOINT sp|设置回滚点|
+|step5|select xxx|备份数据|
+|step6|ROLLBACK TO SAVEPOINT sp/RELEASE SAVEPOINT sp|结束一张表备份，回到sp|
