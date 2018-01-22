@@ -221,8 +221,7 @@ Master_SSL_Verify_Server_Cert: No
 
 **tips:**
 
-①Seconds_Behind_Master: 
-The number of seconds that the slave SQL thread is behind processing the master binary log
+①Seconds_Behind_Master: The number of seconds that the slave SQL thread is behind processing the master binary log
 
 relay log中event记录的时间戳是主库上的时间戳，而SQL thread的时间戳是从库上的，只有主从时间完全一致，该指标才有意义
 
