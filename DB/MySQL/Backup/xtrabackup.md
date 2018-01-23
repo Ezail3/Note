@@ -12,22 +12,22 @@
 
 ### 安装
 ```
-yum install perl-DBD-MySQL
+[root@VM_0_5_centos src]# yum install perl-DBD-MySQL
 不安装这个备份会报错：Failed to connect to MySQL server: DBI connect
 
-cd /usr/local/src
-wget https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-2.4.7/binary/tarball/percona-xtrabackup-2.4.7-Linux-x86_64.tar.gz
-tar zxvf percona-xtrabackup-2.4.7-Linux-x86_64.tar.gz -C ..
+[root@VM_0_5_centos src]# cd /usr/local/src
+[root@VM_0_5_centos src]# wget https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-2.4.7/binary/tarball/percona-xtrabackup-2.4.7-Linux-x86_64.tar.gz
+[root@VM_0_5_centos src]# tar zxvf percona-xtrabackup-2.4.7-Linux-x86_64.tar.gz -C ..
 添加环境变量
-cd ..
-ln -s percona-xtrabackup-2.4.7-Linux-x86_64/ xtrabackup
-echo "PATH=/usr/local/xtrabackup/bin:$PATH" >> /etc/profile
-source /etc/profile
+[root@VM_0_5_centos src]# cd ..
+[root@VM_0_5_centos src]# ln -s percona-xtrabackup-2.4.7-Linux-x86_64/ xtrabackup
+[root@VM_0_5_centos src]# echo "PATH=/usr/local/xtrabackup/bin:$PATH" >> /etc/profile
+[root@VM_0_5_centos src]# source /etc/profile
 ```
 
 ### 玩一手
 ```
-innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /data/backup > backup.xbstream
+[root@VM_0_5_centos src]# innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /data/backup > backup.xbstream
 建议用-S连接，默认走socket，不用-S可能报连不上
 
 常用参数：throttle
