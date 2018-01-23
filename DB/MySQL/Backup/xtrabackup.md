@@ -29,6 +29,9 @@ source /etc/profile
 ```
 innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /data/backup > backup.xbstream
 建议用-S连接，默认走socket，不用-S可能报连不上
+
+常用参数：throttle
+指定备份时用到的iops是多少，限制速度
 ```
 
 8个压缩线程，4个备份线程
@@ -261,8 +264,7 @@ Starting MySQL. SUCCESS!
 
 但非常不建议用这个增量备份功能，性能特别差
 
-举例：
-之前全备100G，今天更新了30G，做增量要扫描100G文件才知道哪些页改动了，再去备份，线上很难接受
+若昨天全备100G，今天更新了30G，做增量要扫描100G文件才知道哪些页改动了，再去备份，线上很难接受
 
 percona有个参数可以监控哪些页改动了，所以不用去扫之前的所有备份的表空间，但用的也比较少
 
