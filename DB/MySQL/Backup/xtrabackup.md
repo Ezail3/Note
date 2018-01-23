@@ -154,6 +154,8 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 
 ③和mysqldump、mydumper相比，xtrabackup备份的是结束时间点的数据(二进制文件位置点不一样)，所以物理备份除了本身恢复块之外，同步也快，因为不用拉数据，做一个一小时的备份，逻辑备份需要做一个小时的数据同步，物理备份不需要
 
+④备份过程中遇到myisam还是会阻塞，数据一致性需求
+
 ## Ⅳ、xtrabackup备份恢复
 
 ### 查看备份文件
