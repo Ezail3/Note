@@ -27,7 +27,7 @@ source /etc/profile
 
 ### 玩一手
 ```
-innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /tmp > backup.xbstream
+innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /data/backup > backup.xbstream
 建议用-S连接，默认走socket，不用-S可能报连不上
 ```
 
@@ -108,7 +108,7 @@ xtrabackup: Stopping log copying thread.
 
 180122 19:47:55 [00] Compressing and streaming ib_buffer_pool to <STDOUT>
 180122 19:47:55 [00]        ...done
-180122 19:47:55 Backup created in directory '/tmp/'
+180122 19:47:55 Backup created in directory '/data/backup'
 MySQL binlog position: filename 'bin.000006', position '154'
 180122 19:47:55 [00] Compressing and streaming backup-my.cnf
 180122 19:47:55 [00]        ...done
@@ -117,7 +117,7 @@ MySQL binlog position: filename 'bin.000006', position '154'
 xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 180122 19:47:55 completed OK!
 180122 19:47:55 [00]        ...done
-180122 19:47:55 Backup created in directory '/tmp/'
+180122 19:47:55 Backup created in directory '/data/backup'
 MySQL binlog position: filename 'bin.000006', position '154'
 180122 19:47:55 [00] Compressing and streaming backup-my.cnf
 180122 19:47:55 [00]        ...done
@@ -154,7 +154,7 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 
 ③和mysqldump、mydumper相比，xtrabackup备份的是结束时间点的数据(二进制文件位置点不一样)，所以物理备份除了本身恢复块之外，同步也快，因为不用拉数据，做一个一小时的备份，逻辑备份需要做一个小时的数据同步，物理备份不需要
 
-## xtrabackup备份恢复
+## Ⅳ、xtrabackup备份恢复
 
 ### 查看备份文件
 由于我这里用的是流文件的方式备份的，所以要先打开流文件
@@ -234,4 +234,20 @@ compressed = compressed
 encrypted = N
 ------
 xtrabackup_logfile                                                # 持续备份的redo，直接看不了
+```
+
+### 恢复一手瞅瞅
+```
+step1: 应用日志，将backup恢复
+[root@VM_0_5_centos mdata]# innobackupex --apply-log backup
+
+step2：将恢复好的数据拷贝到datadir,直接move也行
+[root@VM_0_5_centos mdata]# innobackupex --copy-back backup
+
+step3：修改文件属主
+[root@VM_0_5_centos mdata]# chown -R mysql:mysql mysql_test_data
+
+step4：启动数据库
+/etc/init.d/mysql.server start
+Starting MySQL. SUCCESS! 
 ```
