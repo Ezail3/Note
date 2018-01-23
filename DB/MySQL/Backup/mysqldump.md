@@ -62,7 +62,7 @@ Query OK, 0 rows affected (0.00 sec)
 Query OK, 0 rows affected (0.00 sec)
 
 session 2:
-mysqldump --single-transaction --master-data=2 -B dump_test > /tmp/back.sql
+[root@VM_0_5_centos src]# mysqldump --single-transaction --master-data=2 -B dump_test > /tmp/back.sql
 
 session 1:
 (root@localhost) [(none)]> set global general_log = 0;
