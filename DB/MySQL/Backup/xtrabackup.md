@@ -212,7 +212,7 @@ last_lsn = 10304795
 compact = 0
 recover_binlog_info = 0
 ------
-[root@VM_0_5_centos backup]# cat xtrabackup_info       # 整个备份过程中的信息
+[root@VM_0_5_centos backup]# cat xtrabackup_info                  # 整个备份过程中的信息
 uuid = 48febc78-0012-11e8-b724-525400a4dac1
 name = 
 tool_name = innobackupex
@@ -233,5 +233,5 @@ compact = N
 compressed = compressed
 encrypted = N
 ------
-xtrabackup_logfile    # 持续备份的redo，直接看不了
+xtrabackup_logfile                                                # 持续备份的redo，直接看不了
 ```
