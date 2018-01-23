@@ -154,3 +154,84 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 
 ③和mysqldump、mydumper相比，xtrabackup备份的是结束时间点的数据(二进制文件位置点不一样)，所以物理备份除了本身恢复块之外，同步也快，因为不用拉数据，做一个一小时的备份，逻辑备份需要做一个小时的数据同步，物理备份不需要
 
+## xtrabackup备份恢复
+
+### 查看备份文件
+由于我这里用的是流文件的方式备份的，所以要先打开流文件
+```
+[root@VM_0_5_centos backup]# xbstream -x < backup.xbstream
+[root@VM_0_5_centos backup]# ll
+total 2792
+drwxr-x--- 2 root root    4096 Jan 23 15:52 abc
+-rw-r----- 1 root root     417 Jan 23 15:52 backup-my.cnf.qp
+-rw-r--r-- 1 root root 1822257 Jan 23 15:51 backup.xbstream
+drwxr-x--- 2 root root    4096 Jan 23 15:52 dump_test
+-rw-r----- 1 root root     370 Jan 23 15:52 ib_buffer_pool.qp
+-rw-r----- 1 root root  969374 Jan 23 15:52 ibdata1.qp
+drwxr-x--- 2 root root    4096 Jan 23 15:52 mysql
+drwxr-x--- 2 root root    4096 Jan 23 15:52 performance_schema
+drwxr-x--- 2 root root   12288 Jan 23 15:52 sys
+drwxr-x--- 2 root root    4096 Jan 23 15:52 test
+-rw-r----- 1 root root     102 Jan 23 15:52 xtrabackup_binlog_info.qp
+-rw-r----- 1 root root     115 Jan 23 15:52 xtrabackup_checkpoints
+-rw-r----- 1 root root     494 Jan 23 15:52 xtrabackup_info.qp
+-rw-r----- 1 root root     391 Jan 23 15:52 xtrabackup_logfile.qp
+
+看到很多qp文件，是因为备份时做了压缩，我们需要将其解压
+[root@VM_0_5_centos backup]# for f in `find ./ -iname "*\.qp"`; do qpress -dT4 $f  $(dirname $f) && rm -f $f; done
+[root@VM_0_5_centos backup]# ll
+total 14152
+drwxr-x--- 2 root root     4096 Jan 23 15:55 abc
+-rw-r--r-- 1 root root      427 Jan 23 15:55 backup-my.cnf
+-rw-r--r-- 1 root root  1822257 Jan 23 15:51 backup.xbstream
+drwxr-x--- 2 root root     4096 Jan 23 15:55 dump_test
+-rw-r--r-- 1 root root      413 Jan 23 15:55 ib_buffer_pool
+-rw-r--r-- 1 root root 12582912 Jan 23 15:55 ibdata1
+drwxr-x--- 2 root root     4096 Jan 23 15:55 mysql
+drwxr-x--- 2 root root    12288 Jan 23 15:55 performance_schema
+drwxr-x--- 2 root root    12288 Jan 23 15:55 sys
+drwxr-x--- 2 root root     4096 Jan 23 15:55 test
+-rw-r--r-- 1 root root       15 Jan 23 15:55 xtrabackup_binlog_info
+-rw-r----- 1 root root      115 Jan 23 15:52 xtrabackup_checkpoints
+-rw-r--r-- 1 root root      521 Jan 23 15:55 xtrabackup_info
+-rw-r--r-- 1 root root     2560 Jan 23 15:55 xtrabackup_logfile
+
+可以看到，除了备份表空间等，还生成了4个文件
+```
+
+看下4个文件
+```
+[root@VM_0_5_centos backup]# cat xtrabackup_binlog_info           # 记录binlog文件名和position
+bin.000006	154
+------
+[root@VM_0_5_centos backup]# cat xtrabackup_checkpoints           # 记录备份过程中checkpoint、lsn信息
+backup_type = full-backuped
+from_lsn = 0
+to_lsn = 10304786
+last_lsn = 10304795
+compact = 0
+recover_binlog_info = 0
+------
+[root@VM_0_5_centos backup]# cat xtrabackup_info       # 整个备份过程中的信息
+uuid = 48febc78-0012-11e8-b724-525400a4dac1
+name = 
+tool_name = innobackupex
+tool_command = --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 ./
+tool_version = 2.4.7
+ibbackup_version = 2.4.7
+server_version = 5.7.20-log
+start_time = 2018-01-23 15:51:51
+end_time = 2018-01-23 15:51:56
+lock_time = 0
+binlog_pos = filename 'bin.000006', position '154'
+innodb_from_lsn = 0
+innodb_to_lsn = 10304786
+partial = N
+incremental = N
+format = xbstream
+compact = N
+compressed = compressed
+encrypted = N
+------
+xtrabackup_logfile    # 持续备份的redo，直接看不了
+```
