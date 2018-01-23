@@ -127,7 +127,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 ### 解析binlog
 ```
-1、mysqlbinlog bin.000001
+1、[root@VM_0_5_centos src]# mysqlbinlog bin.000001
 截取一段：
 # at 1224
 #171107 10:17:31 server id 3  end_log_pos 1296 CRC32 0xd4d80fa6 	Query	thread_id=3	exec_time=0	error_code=0
@@ -152,7 +152,7 @@ COMMIT/*!*/;
 tips:
 mysqlbinlog --base64-output=never xxx    非row格式下只看ddl，加密的dml不显示
 
-2、mysqlbinlog --base64-output=decode-rows -v bin.000001
+2、[root@VM_0_5_centos src]# mysqlbinlog --base64-output=decode-rows -v bin.000001
 row格式下可以将密文转为伪sql
 同样截取一段
 # at 966
