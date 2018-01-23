@@ -29,9 +29,12 @@ master-data=2
 -t 只备份数据
 --triggers 备份触发器
 --master-data=2 在备份文件中以注释的形式记录备份开始时binlog的position，默认值是1，不注释
+
+tips：
+mysqldump无法备份视图
 ```
 
-常用的几种：
+常见用法：
 ```
 mysqldump --single-transaction -B test a > backup.sql    备份test库和a库
 mysqldump --single-transaction test a > backup.sql       备份test库下的a表
