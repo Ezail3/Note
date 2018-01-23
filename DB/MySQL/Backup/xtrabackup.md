@@ -129,7 +129,9 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 # 生成各种文件，备份结束
 ```
 
-## Ⅲ、xtrabackup流程梳理
+## Ⅲ、xtrabackup原理分析
+
+### xtrabackup全备步骤
 |-|操作|解析|
 |:-:|:-:|:-:|
 |step1|Connecting to MySQL server host|连接登录|
@@ -143,3 +145,12 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 |step9|stopping log copying thread|停止拷贝|
 |step10|unlock tables|释放锁|
 |step11|completed OK|生成各种文件，备份结束|
+
+**tips：**
+
+①简单点说：一个线程备份redo，贯穿整个过程始终，另外的线程备份表空间文件，直到completed OK，备份成功
+
+②5.6之前的xtrabackup有丢数据的风险，强烈建议使用最新版本
+
+③和mysqldump、mydumper相比，xtrabackup备份的是结束时间点的数据(二进制文件位置点不一样)，所以物理备份除了本身恢复块之外，同步也快，因为不用拉数据，做一个一小时的备份，逻辑备份需要做一个小时的数据同步，物理备份不需要
+
