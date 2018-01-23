@@ -258,8 +258,24 @@ Starting MySQL. SUCCESS!
 
 ### 增量备份
 --incremental-history-name=name 可使用改参数做增量备份
+
 但非常不建议用这个增量备份功能，性能特别差
+
 举例：
 之前全备100G，今天更新了30G，做增量要扫描100G文件才知道哪些页改动了，再去备份，线上很难接受
+
 percona有个参数可以监控哪些页改动了，所以不用去扫之前的所有备份的表空间，但用的也比较少
+
 要做增量，用二进制日志的机制来做即可
+
+### 指定库表备份
+同样不推荐这种玩法，强烈建议完整备份
+
+备份原理是备份所有表空间(ibd)，不完整备份的话，可能会遇到各种问题
+
+比如备份了a库,没备份b库，用这个备份恢复后在b库下面创建一个和之前同名的表就创建不了
+
+### 远程备份
+```
+innobackupex --compress --compress-threads=8 --stream=xbstream --user=root --parallel=4 ./ | ssh root@192.168.1.192 "xbstream -x -C /data/www/mysql/backup"
+```
