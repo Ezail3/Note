@@ -62,6 +62,9 @@ xtrabackup:   innodb_log_files_in_group = 2
 xtrabackup:   innodb_log_file_size = 50331648
 InnoDB: Number of pools: 1
 180122 19:47:53 >> log scanned up to (10304795)
+
+# 读取配置文件，寻找对应的文件及日志位置
+
 xtrabackup: Generating a list of tablespaces
 InnoDB: Allocated tablespace ID 51 for dump_test/dump_inno, old maximum was 0
 xtrabackup: Starting 4 threads for parallel data files transfer
@@ -85,13 +88,24 @@ xtrabackup: Starting 4 threads for parallel data files transfer
 
 ...
 
+180122 19:47:55 Finished backing up non-InnoDB tables and files
+
+# 拷贝数据
+
+180122 19:47:55 [00] Compressing and streaming xtrabackup_binlog_info
+180122 19:47:55 [00]        ...done
+
+# 获取二进制文件日志点
+
 180122 19:47:55 Executing FLUSH NO_WRITE_TO_BINLOG ENGINE LOGS...
 xtrabackup: The latest check point (for incremental): '10304786'
 180122 19:47:55 >> log scanned up to (10304795)
 xtrabackup: Stopping log copying thread.
-
 180122 19:47:55 Executing UNLOCK TABLES
 180122 19:47:55 All tables unlocked
+
+# 停止拷贝，释放锁
+
 180122 19:47:55 [00] Compressing and streaming ib_buffer_pool to <STDOUT>
 180122 19:47:55 [00]        ...done
 180122 19:47:55 Backup created in directory '/tmp/'
@@ -102,4 +116,15 @@ MySQL binlog position: filename 'bin.000006', position '154'
 180122 19:47:55 [00]        ...done
 xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 180122 19:47:55 completed OK!
+180122 19:47:55 [00]        ...done
+180122 19:47:55 Backup created in directory '/tmp/'
+MySQL binlog position: filename 'bin.000006', position '154'
+180122 19:47:55 [00] Compressing and streaming backup-my.cnf
+180122 19:47:55 [00]        ...done
+180122 19:47:55 [00] Compressing and streaming xtrabackup_info
+180122 19:47:55 [00]        ...done
+xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
+180122 19:47:55 completed OK!
+
+# 生成各种文件，备份结束
 ```
