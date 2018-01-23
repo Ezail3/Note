@@ -31,7 +31,7 @@ innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.soc
 建议用-S连接，默认走socket，不用-S可能报连不上
 ```
 
-压缩线程8，备份线程4
+8个压缩线程，4个备份线程
 
 输出内容（简化）
 ```
@@ -128,3 +128,18 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 
 # 生成各种文件，备份结束
 ```
+
+## Ⅲ、xtrabackup流程梳理
+|-|操作|解析|
+|:-:|:-:|:-:|
+|step1|Connecting to MySQL server host|连接登录|
+|step2|using the following InnoDB configuration|读相关配置文件|
+|step3|start xtrabackup_log|启用日志文件，记录redo的lsn，同时持续扫描redo log，将新产生的redo拷贝到xtrabackup_logfile|
+|step4|copy innodb tables .ibd、.ibdata1、undo logs|拷贝innodb表的独立表空间、共享表空间、undo日志|
+|step5|flush no_write_to_binlog tables、flush tables with read lock||
+|step6|copy non-innodb tables .MYD、.MYI、.opt、misc files和innodb tables .frm、.opt、misc files|拷贝myisam表相关内容和innodb表的表结构文件|
+|step7|Get binary log position|获取二进制日志位置点，写入到xtrabackup_binlog_info文件|
+|step8|flush no_write_to_binlog engine logs||
+|step9|stopping log copying thread|停止拷贝|
+|step10|unlock tables|释放锁|
+|step11|completed OK|生成各种文件，备份结束|
