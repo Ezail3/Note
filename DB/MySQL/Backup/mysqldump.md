@@ -19,7 +19,7 @@
 
 tips：
 ①mysqldump无法备份视图
-②--set-gtid-purged=OFF 如果实例开了gtid最好加上这个参数，不然备份时候会报warning，且备份出来的数据恢复到其他版本的实例上会报错--set-gtid-purged=OFF 
+②--set-gtid-purged=OFF 如果实例开了gtid最好加上这个参数，不然备份时候会报warning，且备份出来的数据恢复到其他版本的实例上会报错：A partial dump from a server that has GTIDs is not allowed.
 ```
 
 常见用法：
