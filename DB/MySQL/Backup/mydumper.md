@@ -37,16 +37,18 @@ export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
 -t 开几个线程，默认4个
 -o 备份到指定目录
 -x 正则匹配
+-c 压缩
 -B 指定数据库
 -T 指定表
--C 压缩
 -F --chunk-filesize 指定文件大小
 --rows 100000   每10w行导出到一个文件
 ```
 
 ## Ⅳ、玩两手
+
+### 备份
 ```
-mydumper -G -E -R --trx-consistency-only -t 4 -C -B dbt3 -o /mdata/backup
+[root@VM_0_5_centos backup]# mydumper -G -E -R --trx-consistency-only -t 4 -c -B dbt3 -o /mdata/backup
 另开一个会话看下show processlist;可以看到四个线程
 (root@172.16.0.10) [(none)]> show processlist;
 +--------+------+------------------+------+---------+------+-------------------+----------------------------------------------------------+
@@ -61,15 +63,89 @@ mydumper -G -E -R --trx-consistency-only -t 4 -C -B dbt3 -o /mdata/backup
 5 rows in set (0.00 sec)
 ```
 
-进入备份目录
-发现基于每张表备份并产生压缩文件，所以恢复的时候可以指定某张表恢复
-metadata文件    master-data=1    记录二进制日志位置
-打开压缩文件
--schema.sql文件        每张表的表结构
-.sql                            数据文件
--schema-create.sql.gz文件    创建库
+**tips：**
 
-恢复：
+mydumper 参数和其所跟的参数值不能连在一起，不然会报错
+```
+option parsing failed: Error parsing option -r, try --help
+```
+
+### 分析备份内容
+进入备份目录
+```
+[root@VM_0_5_centos backup]# ll
+total 1200340
+ll
+total 305044
+-rw-r--r-- 1 root root       281 Jan 24 10:41 dbt3.customer-schema.sql.gz
+-rw-r--r-- 1 root root   9173713 Jan 24 10:41 dbt3.customer.sql.gz
+-rw-r--r-- 1 root root       401 Jan 24 10:41 dbt3.lineitem-schema.sql.gz
+-rw-r--r-- 1 root root 221097124 Jan 24 10:42 dbt3.lineitem.sql.gz
+-rw-r--r-- 1 root root       228 Jan 24 10:41 dbt3.nation-schema.sql.gz
+-rw-r--r-- 1 root root      1055 Jan 24 10:41 dbt3.nation.sql.gz
+-rw-r--r-- 1 root root       294 Jan 24 10:41 dbt3.orders-schema.sql.gz
+-rw-r--r-- 1 root root  47020810 Jan 24 10:41 dbt3.orders.sql.gz
+-rw-r--r-- 1 root root       264 Jan 24 10:41 metadata
+
+篇幅有限未将所有表列出来
+```
+发现基于每张表备份并产生压缩文件，所以恢复的时候可以指定某张表恢复
+
+喽一眼
+```
+[root@VM_0_5_centos backup]# cat metadata
+Started dump at: 2018-01-24 10:35:50
+SHOW MASTER STATUS:
+	Log: bin.000001
+	Pos: 154
+	GTID:
+
+Finished dump at: 2018-01-24 10:35:50
+```
+
+metadata文件    master-data=1    记录二进制日志位置
+
+打开压缩文件
+```
+[root@VM_0_5_centos backup]# gunzip dbt3.customer-schema.sql.gz dbt3.customer.sql.gz dbt3-schema-create.sql.gz
+
+[root@VM_0_5_centos backup]# cat dbt3-schema-create.sql 
+CREATE DATABASE `dbt3` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+
+[root@VM_0_5_centos backup]# cat dbt3-schema-create.sql 
+CREATE DATABASE `dbt3` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+[root@VM_0_5_centos backup]# cat dbt3.customer-schema.sql
+/*!40101 SET NAMES binary*/;
+/*!40014 SET FOREIGN_KEY_CHECKS=0*/;
+
+CREATE TABLE `customer` (
+  `c_custkey` int(11) NOT NULL,
+  `c_name` varchar(25) DEFAULT NULL,
+  `c_address` varchar(40) DEFAULT NULL,
+  `c_nationkey` int(11) DEFAULT NULL,
+  `c_phone` char(15) DEFAULT NULL,
+  `c_acctbal` double DEFAULT NULL,
+  `c_mktsegment` char(10) DEFAULT NULL,
+  `c_comment` varchar(117) DEFAULT NULL,
+  PRIMARY KEY (`c_custkey`),
+  KEY `i_c_nationkey` (`c_nationkey`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+[root@VM_0_5_centos backup]# head -5 dbt3.customer.sql
+/*!40101 SET NAMES binary*/;
+/*!40014 SET FOREIGN_KEY_CHECKS=0*/;
+/*!40103 SET TIME_ZONE='+00:00' */;
+INSERT INTO `customer` VALUES
+(1,"Customer#000000001","j5JsirBM9PsCy0O1m",15,"25-989-741-2988",711.56,"BUILDING","regular, regular platelets are fluffily according to the even attainments. blithely iron"),
+
+```
+
+综上：
+-schema.sql文件             每张表的表结构
+.sql                        数据文件
+-schema-create.sql.gz文件   创建库
+
+### 恢复
 myloader恢复
 -d 恢复文件目录
 -t 指定线程数
