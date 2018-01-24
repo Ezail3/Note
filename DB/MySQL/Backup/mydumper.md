@@ -182,35 +182,30 @@ show master status
 
 获取二进制文件位置点
 
+
 step2：
 
 主线程创建执行备份任务的子线程并切换到事务隔离级别为rr
 
-session2：
+session2：start transaction with consistent snapshot;
 
-start transaction with consistent snapshot;
+session3：start transaction with consistent snapshot;
 
-session3：
-
-start transaction with consistent snapshot;
-
-session4：
-
-start transaction with consistent snapshot;
+session4：start transaction with consistent snapshot;
 
 这样多个线程读到的内容是一致的
+
 
 step3：
 
 备份no-innodb
+
 
 step4:
 
 session1：
 
 unlock tables;
-
-step5:
 
 备份innodb至备份结束
 
