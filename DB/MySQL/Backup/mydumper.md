@@ -1,17 +1,23 @@
+---
+# mydumper浅析
+---
 
-mysqldump单线程备份，很慢
-恢复慢，一张表一张表备份，
-如果备份了100G的数据，想恢复其中一个表，做不到(所有的表都在一个文件里)
-所以：
-mydumper备份
-备份并行，基于行，即使一张表也能并行，好强
-恢复也是并行
-恢复的时候可以只恢复指定表
-完美
+## Ⅰ、背景
 
+- mysqldump单线程备份，很慢
+- 恢复慢，一张表一张表恢复，
+- 如果备份了100G的数据，想恢复其中一个表，做不到(所有的表都在一个文件里)
 
+所以推荐使用mydumper备份
 
-安装
+- 备份并行，基于行，即使一张表也能并行，好强呐
+- 恢复也是并行
+- 恢复的时候可以只恢复指定表
+
+完美(*^__^*) 
+
+## 安装
+```
 yum install -y  glib2-devel mysql-devel zlib-devel pcre-devel openssl-devel cmake gcc gcc-c++
 cd /usr/local/src
 git clone https://github.com/maxbube/mydumper
@@ -20,9 +26,8 @@ cmake .
 make -j 4
 make install
 export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
-
-
-
+```
+## 参数介绍
 参数和mysqldump很多一样
 -G --triggers
 -E --events
@@ -36,6 +41,8 @@ export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
 -C 压缩
 -F --chunk-filesize 指定文件大小
 --rows 100000   每10w行导出到一个文件
+
+
 mydumper -G -E -R --trx-consistency-only -t 4 -C -B sbtest -o /tmp
 看下show processlist;可以看到四个线程
 
