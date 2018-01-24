@@ -116,7 +116,7 @@ tips：ignore N lines 可指定不到如前N行
    waiting for table metadata lock                              加了元数据锁
 3、把源实例的表空间拷贝一份到目标实例
 4、源服务器：unlock tables;    释放锁
-5、调整用户权限
+5、调整文件用户权限
 6、目标服务器：alter table t import tablespace;                   导入
 
 傻瓜式操作，简单快捷，不演示了，真的有点累啊！
