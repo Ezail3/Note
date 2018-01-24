@@ -1,5 +1,5 @@
 ---
-# MySQL物理备份介绍
+# MySQL物理备份基本操作
 ---
 
 ## xtrabackup介绍
