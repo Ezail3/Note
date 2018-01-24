@@ -6,6 +6,7 @@
 这种方法需要提前设置一个参数
 
 secure_file_priv
+
 |value|meaning|
 |:-:|:-:|
 |NULL|不允许导入导出|
