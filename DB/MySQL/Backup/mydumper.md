@@ -142,11 +142,11 @@ INSERT INTO `customer` VALUES
 
 综上：
 
--schema.sql文件             每张表的表结构
-
-.sql                        数据文件
-
--schema-create.sql.gz文件   创建库
+|文件|作用|
+|:-:|:-:|
+|-schema.sql|每张表的表结构|
+|.sql|数据文件|
+|-schema-create.sql.gz|创建库| 
 
 ### 恢复
 恢复使用myloader命令
