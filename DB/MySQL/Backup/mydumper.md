@@ -166,7 +166,7 @@ SSD上开4线程比source单线程快将近两倍(hdd盘可能性能提升会受
 
 核心问题：并行怎么做到的？一张表都能并行导出，还要保持一致性
 
-step1：
+**step1：**
 
 主线程session1:
 
@@ -182,8 +182,7 @@ show master status
 
 获取二进制文件位置点
 
-
-step2：
+**step2：**
 
 主线程创建执行备份任务的子线程并切换到事务隔离级别为rr
 
@@ -195,13 +194,11 @@ session4：start transaction with consistent snapshot;
 
 这样多个线程读到的内容是一致的
 
-
-step3：
+**step3：**
 
 备份no-innodb
 
-
-step4:
+**step4:**
 
 session1：
 
@@ -209,9 +206,10 @@ unlock tables;
 
 备份innodb至备份结束
 
+
 从整个流程来看，多个线程看到的数据是一致的，所以select各个表，搞出来的数据是一致的，其实就是利用了mvcc的特性
 
-**问题:**
+**问题：**
 
 一张表怎么并行？
 
