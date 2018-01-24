@@ -16,7 +16,7 @@
 
 完美(*^__^*) 
 
-## 安装
+## Ⅱ、安装
 ```
 yum install -y  glib2-devel mysql-devel zlib-devel pcre-devel openssl-devel cmake gcc gcc-c++
 cd /usr/local/src
@@ -27,8 +27,9 @@ make -j 4
 make install
 export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
 ```
-## 参数介绍
+## Ⅲ、参数介绍
 参数和mysqldump很多一样
+```
 -G --triggers
 -E --events
 -R --routines
@@ -41,10 +42,24 @@ export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
 -C 压缩
 -F --chunk-filesize 指定文件大小
 --rows 100000   每10w行导出到一个文件
+```
 
-
-mydumper -G -E -R --trx-consistency-only -t 4 -C -B sbtest -o /tmp
-看下show processlist;可以看到四个线程
+## Ⅳ、玩两手
+```
+mydumper -G -E -R --trx-consistency-only -t 4 -C -B dbt3 -o /mdata/backup
+另开一个会话看下show processlist;可以看到四个线程
+(root@172.16.0.10) [(none)]> show processlist;
++--------+------+------------------+------+---------+------+-------------------+----------------------------------------------------------+
+| Id     | User | Host             | db   | Command | Time | State             | Info                                                     |
++--------+------+------------------+------+---------+------+-------------------+----------------------------------------------------------+
+| 137488 | root | 172.16.0.5:53046 | NULL | Query   |    0 | starting          | show processlist                                         |
+| 137523 | root | 172.16.0.5:53546 | NULL | Query   |    3 | Sending to client | SELECT /*!40001 SQL_NO_CACHE */ * FROM `dbt3`.`customer` |
+| 137524 | root | 172.16.0.5:53548 | NULL | Query   |    3 | Sending to client | SELECT /*!40001 SQL_NO_CACHE */ * FROM `dbt3`.`lineitem` |
+| 137525 | root | 172.16.0.5:53550 | NULL | Query   |    1 | Sending to client | SELECT /*!40001 SQL_NO_CACHE */ * FROM `dbt3`.`partsupp` |
+| 137526 | root | 172.16.0.5:53552 | NULL | Query   |    3 | Sending to client | SELECT /*!40001 SQL_NO_CACHE */ * FROM `dbt3`.`orders`   |
++--------+------+------------------+------+---------+------+-------------------+----------------------------------------------------------+
+5 rows in set (0.00 sec)
+```
 
 进入备份目录
 发现基于每张表备份并产生压缩文件，所以恢复的时候可以指定某张表恢复
