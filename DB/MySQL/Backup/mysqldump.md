@@ -136,7 +136,7 @@ root@localhost on  using Socket
 
 - start transaction with consistent snapshot
 
-事务隔离级别是rr，开始事务，并且马上创建一个read_view,所以mysqldump备份的数据是备份开始时候的数据而不是备份结束时的数据(备份了30min，整个过程实例一直可读可写，备份的是30min之前的数据而不是30min之后的数据)，位置点问题
+事务隔离级别是rr，开始事务，并且马上创建一个read_view，所以mysqldump备份的数据是备份开始时候的数据而不是备份结束时的数据(备份了30min，整个过程实例一直可读可写，备份的是30min之前的数据而不是30min之后的数据)，位置点问题
 
 执行start transaction同时（而不是等到执行第一条sql）建立与本事务一致性读的snapshot
 
