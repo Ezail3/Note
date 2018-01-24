@@ -86,6 +86,27 @@ Dump completed in 43732 milliseconds
 可以看到138268和138269在备份employees库，138270，138271，138272，138273在备份dbt3，这里没打印全，不过这是真的，不吹牛逼
 ```
 
+## Ⅲ、看下过程吧
+```
+step1:
+session1:
+(root@localhost) [(none)]> truncate mysql.general_log;
+Query OK, 0 rows affected (0.10 sec)
+
+(root@localhost) [(none)]> set global log_output = 'table';
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> set global general_log = 1;
+Query OK, 0 rows affected (0.03 sec)
+
+step2:
+session2:
+[root@VM_0_5_centos ~]# mysqlpump --single-transaction abc > /tmp/backup.sql
+Dump completed in 592 milliseconds
+
+step3:
+
+```
 
 后续关注，现在用不上
 
