@@ -169,11 +169,17 @@ SSD上开4线程比source单线程快将近两倍(hdd盘可能性能提升会受
 step1：
 
 主线程session1:
+
 flush tables with read lock;
+
 整个数据库锁成只读，其他线程只能读，不能写，针对myisam做的
+
 start transaction with consistent snapshot
+
 开启一致性快照事务，针对innodb做的
+
 show master status
+
 获取二进制文件位置点
 
 step2：
