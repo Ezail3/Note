@@ -55,9 +55,17 @@
 ```
 
 ## Ⅱ演示一手
-
-
 ```
+[root@VM_0_5_centos ~]# mysqlpump --single-transaction --set-gtid-purged=OFF --parallel-schemas=2:employees --parallel-schemas=4:dbt3 -B employees dbt3 > /tmp/backup.sql
+mysqlpump: [Warning] Using a password on the command line interface can be insecure.
+Dump progress: 1/5 tables, 0/7559817 rows
+Dump progress: 3/15 tables, 286750/12022332 rows
+Dump progress: 3/15 tables, 686750/12022332 rows
+Dump progress: 3/15 tables, 1042250/12022332 rows
+...
+Dump completed in 43732 milliseconds
+
+新开一个会话看下情况
 (root@172.16.0.10) [(none)]> show processlist;
 +--------+------+------------------+------+---------+------+-------------------+------------------------------------------------------------------------------------------------------+
 | Id     | User | Host             | db   | Command | Time | State             | Info                                                                                                 |
@@ -74,6 +82,8 @@
 | 138275 | root | 172.16.0.5:39792 | NULL | Sleep   |    1 |                   | NULL                                                                                                 |
 +--------+------+------------------+------+---------+------+-------------------+------------------------------------------------------------------------------------------------------+
 10 rows in set (0.00 sec)
+
+可以看到
 ```
 
 
