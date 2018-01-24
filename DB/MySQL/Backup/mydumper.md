@@ -168,7 +168,7 @@ SSD上开4线程比source单线程快将近两倍(hdd盘可能性能提升会受
 
 **step1：**
 
-主线程session1:
+session1(主线程):
 
 flush tables with read lock;			整个数据库锁成只读，其他线程只能读，不能写，针对myisam做的
 
