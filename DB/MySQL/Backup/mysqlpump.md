@@ -86,9 +86,8 @@ Dump completed in 43732 milliseconds
 可以看到138268和138269在备份employees库，138270，138271，138272，138273在备份dbt3，这里没打印全，不过这是真的，不吹牛逼
 ```
 
-## Ⅲ、看下过程吧
+## Ⅲ、看下备份过程吧
 ```
-step1:
 session1:
 (root@localhost) [(none)]> truncate mysql.general_log;
 Query OK, 0 rows affected (0.10 sec)
@@ -99,14 +98,66 @@ Query OK, 0 rows affected (0.00 sec)
 (root@localhost) [(none)]> set global general_log = 1;
 Query OK, 0 rows affected (0.03 sec)
 
-step2:
 session2:
 [root@VM_0_5_centos ~]# mysqlpump --single-transaction abc > /tmp/backup.sql
 Dump completed in 592 milliseconds
 
-step3:
-
+(root@localhost) [(none)]> select thread_id,left(argument, 64) from mysql.general_log order by event_time;
+省略部分输出：
++-----------+------------------------------------------------------------------+
+|         7 | root@localhost on  using Socket                                  |
+|         7 | FLUSH TABLES WITH READ LOCK                                      |
+|         7 | SHOW WARNINGS                                                    |
+|         7 | SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ          |
+|         7 | SHOW WARNINGS                                                    |
+|         7 | START TRANSACTION WITH CONSISTENT SNAPSHOT                       |
+|         7 | SHOW WARNINGS                                                    |
+|         8 | root@localhost on  using Socket                                  |
+|         8 | SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ          |
+|         8 | SHOW WARNINGS                                                    |
+|         8 | START TRANSACTION WITH CONSISTENT SNAPSHOT                       |
+|         8 | SHOW WARNINGS                                                    |
+|         9 | root@localhost on  using Socket                                  |
+|         9 | SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ          |
+|         9 | SHOW WARNINGS                                                    |
+|         9 | START TRANSACTION WITH CONSISTENT SNAPSHOT                       |
+|         9 | SHOW WARNINGS                                                    |
+|         7 | UNLOCK TABLES                                                    |
+|         7 | SHOW WARNINGS                                                    |
+|         9 | SET SQL_QUOTE_SHOW_CREATE= 1                                     |
+|         9 | SHOW WARNINGS                                                    |
+|         9 | SET TIME_ZONE='+00:00'                                           |
+|         8 | SET SQL_QUOTE_SHOW_CREATE= 1                                     |
+|         8 | SHOW WARNINGS                                                    |
+|         8 | SET TIME_ZONE='+00:00'                                           |
+|         3 | set global general_log = 0                                       |
++-----------+------------------------------------------------------------------+
+1.线程7 进行 FLUSH TABLES WITH READ LOCK 。对表加一个读锁
+2.线程7、8、9分别开启一个事物（RR隔离级别）去备份数据，由于之前锁表了，所以这三个线程备份出的数据是具有一致性的
+3.线程7 解锁 UNLOCK TABLE
+整个过程没有获取二进制位置点
 ```
 
-后续关注，现在用不上
+## Ⅳ、compress-output
+mysqlpump支持压缩输出，支持LZ4和ZLIB（ZLIB压缩比相对较高，但是速度较慢）
+```
+[root@VM_0_5_centos tmp]# mysqlpump --single-transaction --compress-output=lz4 abc > /tmp/backup_abc.sql
+Dump completed in 511 milliseconds
+```
+## Ⅴ、备份恢复
+未压缩的备份
+```
+mysql < backup.sql
+```
+压缩过的备份
+```
+先解压
+zlib_decompress
+lz4_decompress
+lz4_decompress backup_abc.sql backup.sql
+再导入
+mysql < backup.sql
+```
+可以看出来，这个导入是单线程
 
+后续关注，现在用不上
