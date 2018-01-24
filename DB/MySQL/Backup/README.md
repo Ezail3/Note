@@ -10,6 +10,8 @@
 
 [5、了解mysqlpump工具][5]
 
+[6、数据导入导出][6]
+
 
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/backup_intro.md
@@ -17,3 +19,4 @@
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/mydumper.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/xtrabackup.md
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/mysqlpump.md
+  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/data_import-export.md
