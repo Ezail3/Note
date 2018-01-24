@@ -141,41 +141,63 @@ INSERT INTO `customer` VALUES
 ```
 
 综上：
+
 -schema.sql文件             每张表的表结构
+
 .sql                        数据文件
+
 -schema-create.sql.gz文件   创建库
 
 ### 恢复
-myloader恢复
+恢复使用myloader命令
+```
 -d 恢复文件目录
 -t 指定线程数
 -B 指定库
-myloader -d backup_20170511 -t 4 -B sb
+[root@VM_0_5_centos mdata]# myloader -d /mdata/backup -t 4 -B test
+```
+
+**tips:**
+
 SSD上开4线程比source单线程快将近两倍(hdd盘可能性能提升会受一定影响)
 
-mydumper原理：
+## Ⅴ、mydumper原理：
+这里有了mysqldump的基础就不开glog详细分析了
+
 核心问题：并行怎么做到的？一张表都能并行导出，还要保持一致性
-演示一个例子解释并行：
+
+step1：
 主线程session1:
 flush tables with read lock;
-整个数据库锁成只读，其他线程只能读，不能写
+整个数据库锁成只读，其他线程只能读，不能写，针对myisam做的
+start transaction with consistent snapshot
+开启一致性快照事务，针对innodb做的
+show master status
+获取二进制文件位置点
 
-其他线程切换到事务隔离级别为rr
+step2：
+主线程创建执行备份任务的子线程并切换到事务隔离级别为rr
 session2：
 start transaction with consistent snapshot;
-
 session3：
 start transaction with consistent snapshot;
-
 session4：
 start transaction with consistent snapshot;
+这样多个线程读到的内容是一致的
 
+step3：
+备份no-innodb
+
+step4:
 session1：
 unlock tables;
 
-其他线程开始做备份
+step5:
+备份innodb至备份结束
 
-多个线程看到的数据是一致的，select各个表，搞出来的数据是一致的
+从整个流程来看，多个线程看到的数据是一致的，所以select各个表，搞出来的数据是一致的，其实就是利用了mvcc的特性
 
-一张表怎么并行（前提是表中必须有唯一索引）：
+**问题:**
+
+一张表怎么并行（前提是表中必须有唯一索引,且唯一索引必须是整型，不能是复合索引）
 先检测唯一索引，根据唯一索引对表进行分片再进行备份，提前切好，区间先算好(不是每个区间相等)，show processlist;中可以看出来
