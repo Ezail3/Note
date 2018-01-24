@@ -129,6 +129,11 @@ import并不是秒级别的，和表空间大小有关，需要修改元数据�
 
 - 可能数据量比较大，和xtrabackup一样
 
+**限制：**
+
+- 两个实例都必须开启独立表空间，innodb_file_per_table
+- 迁移的两个实例的innodb_page_size必须一致，并且mysql server版本建议一致
+
 这个特性并没有得到广泛应用
 
 ## Ⅲ、好东西
