@@ -2,7 +2,7 @@
 
 [1、备份基本概念介绍][1]
 
-[2、mysqldump详解|][2]
+[2、mysqldump详解][2]
 
 [3、mydumper浅析][3]
 
