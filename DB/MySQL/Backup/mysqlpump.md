@@ -45,7 +45,7 @@
 
 - 无法获取当前备份对应的binlog位置
 
-- MySQL5.7.11之前的版本不要用mysqlpump，并行导出和single-transaction是互斥的
+- MySQL5.7.11之前的版本不要使用，并行导出和single-transaction是互斥的
 
 ### 重要参数
 ```
