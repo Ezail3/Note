@@ -170,17 +170,11 @@ SSD上开4线程比source单线程快将近两倍(hdd盘可能性能提升会受
 
 主线程session1:
 
-flush tables with read lock;
+flush tables with read lock;			整个数据库锁成只读，其他线程只能读，不能写，针对myisam做的
 
-整个数据库锁成只读，其他线程只能读，不能写，针对myisam做的
+start transaction with consistent snapshot	开启一致性快照事务，针对innodb做的
 
-start transaction with consistent snapshot
-
-开启一致性快照事务，针对innodb做的
-
-show master status
-
-获取二进制文件位置点
+show master status				获取二进制文件位置点
 
 **step2：**
 
@@ -200,12 +194,9 @@ session4：start transaction with consistent snapshot;
 
 **step4:**
 
-session1：
-
-unlock tables;
+session1：unlock tables;
 
 备份innodb至备份结束
-
 
 从整个流程来看，多个线程看到的数据是一致的，所以select各个表，搞出来的数据是一致的，其实就是利用了mvcc的特性
 
