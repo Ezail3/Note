@@ -1,5 +1,5 @@
 ---
-# 了解mysqlpump工具备份
+# 了解mysqlpump工具
 ---
 
 ## Ⅰ、功能分析
