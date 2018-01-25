@@ -265,7 +265,7 @@ Starting MySQL. SUCCESS!
 
 - 所以我们一般用xtrabackup_binlog_info中的binlog position
 
-根据之前分析的备份流程可知，先备份innodb表，所以这块也不难理解
+ 根据之前分析的备份流程可知，先备份innodb表，所以这块也不难理解
 
 
 ## Ⅴ、其他相关问题
