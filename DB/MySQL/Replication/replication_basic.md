@@ -259,6 +259,10 @@ master-retry-count      重连次数
 ### 从
 ```
 show slave status;
+
+change master to
+
+start/stop slave
 ```
 
 ### 报错处理
