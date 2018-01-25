@@ -259,14 +259,11 @@ Starting MySQL. SUCCESS!
 
 **tips：**
 
-- 日志应用完成后，backup文件中会多出一个文件：xtrabackup_binlog_pos_innodb，记录的是innodb表当前的binlog position，而xtrabackup_binlog_info记录的是整个实例当前的binlog position
+- 日志应用完成后，backup文件中会多出一个文件：xtrabackup_binlog_pos_innodb，记录的是用于innodb的binlog的当前position，而xtrabackup_binlog_info记录的是整个实例当前的binlog position
 
-- 般情况下，这两个位置点是一样的，但备份时两种引擎都存在时,则xtrabackup_binlog_info > xtrabackup_binlog_pos_innodb 
+- 般情况下，这两个位置点是一样的，但备份时两种引擎都存在时,则有可能出现xtrabackup_binlog_info.pos > xtrabackup_binlog_pos_innodb.pos 
 
 - 所以我们一般用xtrabackup_binlog_info中的binlog position
-
- 根据之前分析的备份流程可知，先备份innodb表，所以这块也不难理解
-
 
 ## Ⅴ、其他相关问题
 
