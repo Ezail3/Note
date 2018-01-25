@@ -20,8 +20,8 @@
 ### 导出
 ```
 select * into outfile 'xxx.data' from xxx    #sql语句随便写
-fields terminated by 'string'    指定分隔符，默认tab
-lines terminated by 'string'    指定结束符，默认换行
+fields terminated by 'string'                指定分隔符，默认tab
+lines terminated by 'string'                 指定结束符，默认换行
 
 测试一把
 (root@localhost) [test]> select * from data_load;
