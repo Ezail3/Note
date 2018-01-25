@@ -249,7 +249,9 @@ step1: 应用日志，将backup恢复
 这边有个注意点：
 日志应用完成后，backup文件中会多出一个文件：xtrabackup_binlog_pos_innodb，记录的是innodb表当前的binlog position
 而xtrabackup_binlog_info记录的是整个实例当前的binlog position
+
 一般情况下，这两个位置点是一样的，但备份时两种引擎都存在时,则xtrabackup_binlog_info > xtrabackup_binlog_pos_innodb (根据之前分析的备份流程可知，先备份innodb表)
+
 综上，我们一般用xtrabackup_binlog_info中的binlog position
 
 step2：将恢复好的数据拷贝到datadir,直接move也行
