@@ -259,6 +259,9 @@ step3：编辑index文件，将rm掉的binlog文件从index中去掉
 [mysqld]
 expire_logs_days=N
 表示只保存N天的binlog，默认值是0，表示不删除
+
+实现原理：
+当binlog文件切换或者mysql服务启动时，遍历index文件，找到第一个"最后修改时间在N天之内的文件"，然后将该文件之前的所有binlog全部删除
 ```
 
 ## Ⅷ、其他相关问题
