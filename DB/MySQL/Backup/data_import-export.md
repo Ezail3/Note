@@ -114,17 +114,18 @@ myisam表flush一下就可以随意copy，innodb不行？ 那是innodb的信息�
 ```
 1、目标服务器：alter table t discard tablespace;                 删除表空间文件
 2、源服务器：flush tables t for export;                          锁成只读
-   show processlist;    
+   show processlist;
    waiting for table metadata lock                              加了元数据锁
 3、把源实例的表空间拷贝一份到目标实例
-4、源服务器：unlock tables;    释放锁
+4、源服务器：unlock tables;                                      释放锁
 5、调整文件用户权限
-6、目标服务器：alter table t import tablespace;                   导入
+6、目标服务器：alter table t import tablespace;                  导入
 
 傻瓜式操作，简单快捷，不演示了，真的有点累啊！
 ```
 
 不希望有warning的话，还有个cfg文件需要处理一下
+
 import并不是秒级别的，和表空间大小有关，需要修改元数据，tablespace里面有space id和page no，两个ibd文件的space id是完全一样的，import的时候需要修改一下space id
 
 **缺点：**
