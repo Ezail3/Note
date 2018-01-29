@@ -82,6 +82,7 @@ now是sql开始执行的时间,sysdate是函数本身开始执行的时间
 - 5.6想要filtered得用explain extented
 
 --sysdate-is-now 可以强制把sysdate改为now
+
 [root@VM_0_5_centos ~]# mysqld --verbose --help |grep sysdate
 
 --sysdate-is-now    Non-default option to alias SYSDATE() to NOW() to make it
