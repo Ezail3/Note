@@ -111,3 +111,27 @@ sysdate-is-now
 ```
 
 ## Ⅳ、字符拼接
+```
+(root@localhost) [(none)]> select concat('a','bc');
++------------------+
+| concat('a','bc') |
++------------------+
+| abc              |
++------------------+
+1 row in set (0.00 sec)
+
+(root@localhost) [(none)]> set sql_mode='pipes_as_concat';
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> select 'a'||'bc';
++-----------+
+| 'a'||'bc' |
++-----------+
+| abc       |
++-----------+
+1 row in set (0.00 sec)
+```
+
+**tips:**
+
+sql_mode一定要设置一把，不然拼起来会出错，是数字，不信试试
