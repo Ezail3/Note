@@ -19,6 +19,7 @@
 | NULL      |         | 20       |
 +-----------+---------+----------+
 1 row in set (0.00 sec)
+这里和oracle不一样的是，MySQL中''和null不是一回事
 
 (root@localhost) [(none)]> select isnull(null),isnull(0),isnull(1/0);
 +--------------+-----------+-------------+
@@ -27,8 +28,7 @@
 |            1 |         0 |           1 |
 +--------------+-----------+-------------+
 1 row in set (0.00 sec)
-
-(root@localhost) [(none)]>
+这里注意:1/0在MySQL中不会报错
 ```
 
 ## Ⅱ、时间函数
