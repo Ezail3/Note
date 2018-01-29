@@ -32,6 +32,59 @@
 ```
 
 ## Ⅱ、时间函数
+```
+(root@localhost) [(none)]> select now(),sysdate(),sleep(2),now(),sysdate()\G
+*************************** 1. row ***************************
+    now(): 2018-01-29 11:06:12
+sysdate(): 2018-01-29 11:06:12
+ sleep(2): 0
+    now(): 2018-01-29 11:06:12
+sysdate(): 2018-01-29 11:06:14
+1 row in set (2.04 sec)
+```
+now是sql开始执行的时间,sysdate是函数本身开始执行的时间
+
+案例：
+```
+(root@172.16.0.10) [employees]> desc salaries;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| emp_no    | int(11) | NO   | PRI | NULL    |       |
+| salary    | int(11) | NO   |     | NULL    |       |
+| from_date | date    | NO   | PRI | NULL    |       |
+| to_date   | date    | NO   |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+(root@172.16.0.10) [employees]> desc select * from salaries where emp_no=10001 and from_date>now();
++----+-------------+----------+------------+-------+----------------+---------+---------+------+------+----------+-------------+
+| id | select_type | table    | partitions | type  | possible_keys  | key     | key_len | ref  | rows | filtered | Extra       |
++----+-------------+----------+------------+-------+----------------+---------+---------+------+------+----------+-------------+
+|  1 | SIMPLE      | salaries | NULL       | range | PRIMARY,emp_no | PRIMARY | 7       | NULL |    1 |   100.00 | Using where |
++----+-------------+----------+------------+-------+----------------+---------+---------+------+------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+
+(root@172.16.0.10) [employees]> desc select * from salaries where emp_no=10001 and from_date>sysdate();
++----+-------------+----------+------------+------+----------------+---------+---------+-------+------+----------+-------------+
+| id | select_type | table    | partitions | type | possible_keys  | key     | key_len | ref   | rows | filtered | Extra       |
++----+-------------+----------+------------+------+----------------+---------+---------+-------+------+----------+-------------+
+|  1 | SIMPLE      | salaries | NULL       | ref  | PRIMARY,emp_no | PRIMARY | 4       | const |   17 |    33.33 | Using where |
++----+-------------+----------+------------+------+----------------+---------+---------+-------+------+----------+-------------+
+1 row in set, 1 warning (0.01 sec)
+```
+
+综上：建议统一规范用now，可以当作常数用，而sysdate是一直变的，会导致索引用不上
+
+**tips:**
+
+- 5.7的desc很好用，可以看到filtered
+- 5.6想要filtered得用explain extented
+
+--sysdate-is-now 可以强制把sysdate改为now
+[root@VM_0_5_centos ~]# mysqld --verbose --help |grep sysdate
+  --sysdate-is-now    Non-default option to alias SYSDATE() to NOW() to make it
+sysdate-is-now 
 
 ## Ⅲ、补位与空格
 
