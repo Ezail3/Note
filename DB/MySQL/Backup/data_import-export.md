@@ -113,7 +113,7 @@ myisam表flush一下就可以随意copy，innodb不行？ 那是innodb的信息�
 操作步骤：
 ```
 1、目标服务器：alter table t discard tablespace;                 删除表空间文件
-2、源服务器：flush tables t for export;                          锁成只读
+2、源服务器：flush table t for export;                           锁成只读
    show processlist;
    waiting for table metadata lock                              加了元数据锁
 3、把源实例的表空间拷贝一份到目标实例
