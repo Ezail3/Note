@@ -14,4 +14,4 @@
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/replication_basic.md
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/replication_advanced.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/semi-sync_replication.md
-  [5]:
+  [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/gtid.md
