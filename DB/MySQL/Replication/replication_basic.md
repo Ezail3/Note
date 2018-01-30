@@ -48,8 +48,11 @@ MySQL中事务越大commit越慢，binlog是事务执行完commit之后才写，
 **小常识**
 
 MySQL的事务一次commit分成三个阶段
+
 第一阶段的prepare和第三阶段的commit都在innodb层
+
 第二阶段的write binlog在server层
+
 三个步骤都是group commit的，所以性能不会差
 
 ### 基本原理
