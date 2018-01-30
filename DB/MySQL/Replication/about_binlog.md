@@ -232,7 +232,9 @@ mysqlbinlog binlog.[0-9]* |mysql -u root -p
 
 一个一个恢复会报danger
 
-说明：如果分两次操作，会被认为在两个session中操作，如果刚好用到一个临时表，一个session退出了，另一个session上去就出错了
+**说明：**
+
+如果分两次操作，会被认为在两个session中操作，如果刚好用到一个临时表，一个session退出了，另一个session上去就出错了
 
 另一种方法：
 ```
