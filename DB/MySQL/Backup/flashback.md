@@ -137,3 +137,20 @@ Empty set (0.00 sec)
 tips:
 恢复的时候不要加--base64-output=decode-rows，导不进去，没反应
 ```
+
+## Ⅲ、关于flashback回放的位置点
+假设Master宕机切到了Slave，Master恢复后，可能需要将部分数据Flashback掉(宕机前最后一部分未传过去的binlog)，Flashback掉的位置很关键，这个位置一般 以Slave上SQL线程最终回放完的位置为准
+
+## Ⅳ、相关小结
+- flashback是基于binlog的逆操作(逻辑)，Oracle的闪回是基于undo做的(物理)
+
+- 使用flashback，binlog_format必须为row，这个之前binlog章节有简单提到过
+
+- binlog_row_image必须设为full
+
+- flashback仅支持DML操作的闪回，不支持ddl
+
+- 同一事务中的DML语句不仅闪回，语句执行顺序也会倒过来(有兴趣的可以测试，篇幅原因只贴了一个delete操作)
+
+**tips：**
+DDL的闪回功能，商业版InnoSQL是支持的，修改了MySQL源码，将删除的库或者表保存在回收站(Recycle Bin Tablespace)
