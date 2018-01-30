@@ -19,4 +19,4 @@
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/mydumper.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/xtrabackup.md
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/mysqlpump.md
-  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/data_import-export.md
+  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/data_import%26export.md
