@@ -121,6 +121,19 @@ Empty set (0.00 sec)
 ###   @4=7
 可以看到删除变成插入了
 
-[root@VM_0_5_centos flashback]# ./mysqlbinlog -B --base64-output=decode-rows -v bin.000001 --start-position=3028 |mysql -S /tmp/mysql3306.sock
+[root@VM_0_5_centos flashback]# ./mysqlbinlog -B -v bin.000001 --start-position=3028 |mysql -S /tmp/mysql3306.sock
+(root@localhost) [test]> select * from flashback;
++------+------+------+------+
+| a    | b    | c    | d    |
++------+------+------+------+
+|    1 |    2 |    3 |    4 |
+|    2 |    3 |    4 |    5 |
+|    3 |    4 |    5 |    6 |
+|    4 |    5 |    6 |    7 |
++------+------+------+------+
+4 rows in set (0.00 sec)
+恢复成功
 
+tips:
+恢复的时候不要加--base64-output=decode-rows，导不进去，没反应
 ```
