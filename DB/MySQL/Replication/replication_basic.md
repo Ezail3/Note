@@ -67,7 +67,9 @@ MySQL的事务一次commit分成三个阶段
 ```
 
 当commit写到二进制文件之后，如果搭建了复制，就会有一个dump thread将binlog传送到远程服务器
+
 远端服务器上有一个IO thread来接收这些event放到relay log中，还有一个SQL thread来回放relay log中的event
+
 5.6版本开始，可以多个线程并行回放，所以速度相对来说可能快一些
 
 **tips：**
