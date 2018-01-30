@@ -12,7 +12,7 @@
 
 [6、数据导入导出][6]
 
-[7、闪回工具——flashback][7]
+[1][7]
 
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/backup_intro.md
