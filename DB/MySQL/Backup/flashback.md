@@ -153,4 +153,9 @@ tips:
 - 同一事务中的DML语句不仅闪回，语句执行顺序也会倒过来(有兴趣的可以测试，篇幅原因只贴了一个delete操作)
 
 **tips：**
-DDL的闪回功能，商业版InnoSQL是支持的，修改了MySQL源码，将删除的库或者表保存在回收站(Recycle Bin Tablespace)
+
+①DDL的闪回功能，商业版InnoSQL是支持的，修改了MySQL源码，将删除的库或者表保存在回收站(Recycle Bin Tablespace)
+
+②这里我们分析的是出事之后的挽回，那我们最好的办法就是尽量不要惹事，这里推荐一个参数sql_safe_updates，默认是off的，开启此参数，执行的sql中存在不带where条件的delete和update就会报错1175
+
+最后祝大家，永远不用flashback，一路平安！！！
