@@ -95,7 +95,7 @@ Empty set (0.00 sec)
 可以看到删除了4条记录
 
 来看下flashback的核心参数-B，同样截取重点
-[root@VM_0_5_centos flashback]# ./mysqlbinlog --base64-output=decode-rows -v bin.000001 --start-position=3028
+[root@VM_0_5_centos flashback]# ./mysqlbinlog -B --base64-output=decode-rows -v bin.000001 --start-position=3028
 ### INSERT INTO `test`.`flashback`
 ### SET
 ###   @1=1
