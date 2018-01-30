@@ -283,7 +283,7 @@ Oracle增量备份还是有用的，万一page发生crash，需要把所有日�
 
 MySQL5.6推出下面这个参数来指定scan算法可以部分解决无主键表导致的复制延迟问题，其基本思路是对于在一个ROWS EVENT中的所有前镜像收集起来，然后在一次扫描全表时，判断HASH中的每一条记录进行更新
 
-slave_rows_search_algorithms，默认值是table_scan，index_scan，另一个hash_scan可配，但不建议用，因为创建一次hash表消耗比较大，还是尽量每张表都要有主键
+slave_rows_search_algorithms，默认值是table_scan，index_scan，另一个hash_scan可配，默认没开，也不建议用，因为创建hash表消耗比较大
 
 ### flash back
 二进制日志能实现一个非常好的功能，用来挽救数据，实现flash back，oracle中还要用到undo
