@@ -34,9 +34,10 @@ innodb_flush_log_at_trx_commit = 1
 innodb_support_xa = 1
 # 上面两个参数是通过内部分布式事务实现的，所以要开
 
-relay_log_recovery = 1 #I/O thread crash safe    默认关的
-relay_log_info_repository = TABLE # SQL thread crash safe    默认是file
+relay_log_recovery = 1                  # I/O thread crash safe    默认关的
+relay_log_info_repository = TABLE       # SQL thread crash safe    默认是file
 # 高可用切换时，主可能变成从，所以上面两个参数主也要配上
+master_info_repository = TABLE
 
 slave:   
 log_slave_updates
@@ -46,8 +47,8 @@ replicate_ignore_db
 replicate_do_table
 replicate_ignore_table
 server_id = # Unique
-relay_log_recovery = 1 #I/O thread crash safe    默认关的
-relay_log_info_repository = TABLE # SQL thread crash safe    默认是file
+relay_log_recovery = 1                  # I/O thread crash safe 默认关的
+relay_log_info_repository = TABLE       # SQL thread crash safe 默认是file
 master_info_repository = TABLE
 read_only = 1
 ```
