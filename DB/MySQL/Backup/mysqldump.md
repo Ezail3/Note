@@ -144,6 +144,7 @@ root@localhost on  using Socket
 - --single-transaction
 
 所有的数据库都是在一个事务里面读出来，而且事务隔离级别是如rr的，所以读到的数据是一致的
+
 一致性备份：整个备份从start transaction开始，备份所有的表，所有的表的数据都是在一个事务里面，通过select导出来
 
 - savepoint保存点（4.1还是5.0加进来的）
