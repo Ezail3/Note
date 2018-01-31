@@ -187,9 +187,11 @@ update记录前项和后项。全表更新会导致二进制日志特别大
 ```
 
 **问题**：
+
 binlog_format设为row，只知道变化，不知道sql语句，这咋办？
 
 **解决**：
+
 设置参数binlog_rows_query_log_events=1  建议打开
 
 再去看binlog的events，会多一个叫Rows_query的events，它会记录下改变行内容的sql
