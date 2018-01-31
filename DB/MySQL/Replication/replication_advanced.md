@@ -77,8 +77,8 @@ read_only = 1
 - 参数sync_relay_log_info = 10000（fsync）代表每回放10000个event，写一次 relay-info.log,默认1w
 
 综上：SQL线程的数据回放是写数据库操作，relay-info是写文件操作，这两个操作很难保证一致性，看下面这种情况
-```
 
+```
 step1：
 主上顺序插入1，2，3
 
