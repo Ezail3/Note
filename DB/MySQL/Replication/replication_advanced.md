@@ -98,7 +98,9 @@ step3：
 
 MySQL 5.6之后，我们将relay_log_info_repository设置为TABLE，relay-info将写入到mysql.slave_relay_log_info这张表中
 
-原理：将event的回放和relay-info的更新放在同一个事物里面，变成原子操作，从而保证一致性（要么都写入，要么都不写）每一次事物提交，都会写入mysql.slave_relay_log_info中，sync_relay_log_info=N将被忽略
+**原理：**
+
+将event的回放和relay-info的更新放在同一个事物里面，变成原子操作，从而保证一致性（要么都写入，要么都不写）每一次事物提交，都会写入mysql.slave_relay_log_info中，sync_relay_log_info=N将被忽略
 ```
 BEGIN;
  apply log event;
