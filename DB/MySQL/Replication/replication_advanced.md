@@ -13,24 +13,23 @@
 ## Ⅱ、真正高可靠复制环境相关配置(crash-safe replication)
 ```
 master:
-binlog_do_db = # if possible
-binlog_ignore_db = # if possbile
+binlog_do_db =                          # if possible
+binlog_ignore_db =                      # if possbile
 max_binlog_size = 2048M 
 # 默认1g，其实也够用，MySQL每次写满1g后做的切换代价太大，但5.7已经修复了，不是太大问题
 binlog_format = ROW
 transaction_isolation = read-committed
 expire_logs_days = 7 #capacity plan
-server_id = # Unique
-binlog_cache_size = # take care    
+server_id =                             # Unique
+binlog_cache_size =                     # take care    
 # 默认32k，如果一个大事务，产生日志大于32k，那内存写不下就要写磁盘了
 # show global status like 'binlog_cache_disk_use';
 # 表示使用了基于磁盘的binlog的cache有多少
 # 如果这个值比较高，那就可以考虑调大binlog_cache_size
 # 通常32k够用，但是批量删除或者更新就可能超过32k，这时候性能就会下降了
-sync_binlog = 1 # must set to 1,default is 0,5.7.7 default is 1
+sync_binlog = 1                         # must set to 1,default is 0,5.7.7 default is 1
 # 二进制日志一定要实时落盘,这个时时落盘，上一个参数就没用了
-innodb_flush_log_at_trx_commit = 1                                    
-# redo也必须实时落盘
+innodb_flush_log_at_trx_commit = 1      # redo也必须实时落盘
 innodb_support_xa = 1
 # 上面两个参数是通过内部分布式事务实现的，所以要开
 
