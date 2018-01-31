@@ -24,7 +24,8 @@
 
 ### 再说一遍row
 - 优点：记录每一行记录变化，确保证主从数据严格一致性
-- 缺点：全表update，delete全表时binlog文件大，所以不建议用MySQL做类似操作；
+- 缺点：全表update，delete全表时binlog文件大，所以不建议用MySQL做类似操作
+
 调成statement看，会发现记录的是sql语句，不说太多，线上基本上不会用
 
 写入数据量很大时，ROW格式下，commit会比较耗时间，因为他还要写binlog（ binlog在提交时才写入 ）
@@ -190,6 +191,7 @@ binlog_format设为row，只知道变化，不知道sql语句，这咋办？
 
 **解决**：
 设置参数binlog_rows_query_log_events=1  建议打开
+
 再去看binlog的events，会多一个叫Rows_query的events，它会记录下改变行内容的sql
 
 ### 常用参数
@@ -225,6 +227,7 @@ mysqlbinlog binlog.00003 |mysql -S /tmp/mysql.sock -f
 ```
 
 官方文档：
+
 如果存在多个二进制日志，并不建议一个一个恢复，而是用下面这个方法
 ```
 mysqlbinlog binlog.[0-9]* |mysql -u root -p
@@ -269,7 +272,8 @@ expire_logs_days=N
 ## Ⅷ、其他相关问题
 
 ### 增量备份怎么做
-通常MySQL不做增量备份，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可
+通常MySQL不做增量备份，除非单点，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可(flush binary logs;产生新日志，把之前的存下来)
+
 Oracle增量备份还是有用的，万一page发生crash，需要把所有日志重做一遍
 
 ### row格式的binlog回放
@@ -306,7 +310,9 @@ binlog默认写入binlog_cache中
 |3|binlog从内存中sync到文件系统，持久化|
 
 第一步session之间互相看不到
+
 第二步每个session之间互相可以看到
+
 在这之前只要机器发生crash，则日志就相对应的丢失了
 
 特殊情况：遇到大事务时，binlog很大，cache放不下就会落盘
