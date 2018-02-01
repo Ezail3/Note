@@ -20,6 +20,7 @@
 tips：
 ①mysqldump无法备份视图
 ②--set-gtid-purged=OFF 如果实例开了gtid最好加上这个参数，不然备份时候会报warning，且备份出来的数据恢复到其他版本的实例上会报错：A partial dump from a server that has GTIDs is not allowed.
+③--dump-slave，该参数可以用作在从库做备份获取主库的位置点，来做一个新从库，避免在主库做备份影响业务
 ```
 
 常见用法：
