@@ -116,7 +116,7 @@ myisam表flush一下就可以随意copy，innodb不行？ 那是innodb的信息�
 2、源服务器：flush table t for export;                           锁成只读
    show processlist;
    waiting for table metadata lock                              加了元数据锁
-3、把源实例的表空间拷贝一份到目标实例
+3、把源实例的表空间和拷贝一份到目标实例
 4、源服务器：unlock tables;                                      释放锁
 5、调整文件用户权限
 6、目标服务器：alter table t import tablespace;                  导入
