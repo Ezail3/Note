@@ -15,8 +15,8 @@
 ## Ⅱ、真正高可靠复制环境相关配置(crash-safe replication)
 ```
 master:
-binlog_do_db =                          # if possible
-binlog_ignore_db =                      # if possbile
+binlog_do_db                            # if possible
+binlog_ignore_db                        # if possbile
 max_binlog_size = 2048M 
 # 默认1g，其实也够用，MySQL每次写满1g后做的切换代价太大，但5.7已经修复了，不是太大问题
 binlog_format = ROW
