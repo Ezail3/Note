@@ -27,15 +27,15 @@ semi-sync replication
 ```
 step1：
 在线加载插件安装
-mysql>install plugin rpl_semi_sync_master soname 'semisync_master.so';
-mysql>install plugin rpl_semi_sync_slave soname 'semisync_slave.so';
+(root@localhost) [(none)]> install plugin rpl_semi_sync_master soname 'semisync_master.so';
+(root@localhost) [(none)]> install plugin rpl_semi_sync_slave soname 'semisync_slave.so';
 
 写入配置文件
 [mysqld]
 plugin-dir=/usr/local/mysql/lib/plugin
 plugin-load="rpl_semi_sync_master:semisync_master.so;rpl_semi_sync_slave:semisync_slave.so"
 
-show plugins;
+(root@localhost) [(none)]> show plugins;
 截取一段
 +----------------------------+----------+--------------------+--------------------+---------+
 | rpl_semi_sync_master       | ACTIVE   | REPLICATION        | semisync_master.so | GPL     |
@@ -60,14 +60,13 @@ show plugins;
 9 rows in set (0.00 sec)
 
 step2：
-配置
-set global rpl_semi_sync_master_enabled = 1;
-set global rpl_semi_sync_slave_enabled = 1;
+(root@localhost) [(none)]> set global rpl_semi_sync_master_enabled = 1;
+(root@localhost) [(none)]> set global rpl_semi_sync_slave_enabled = 1;
 
 tips:配置文件里都配上哈，主从都搞好
 
 重启一下复制
-主上执行show global status like 'rpl%';
+主上执行
 (root@localhost) [(none)]> show global status like 'rpl%';
 +--------------------------------------------+-------+
 | Variable_name                              | Value |
