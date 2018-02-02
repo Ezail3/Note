@@ -98,8 +98,6 @@ tips:配置文件里都配上哈，主从都搞好
 相关参数：rpl_semi_sync_master_timeout
 
 
+**测试一把：**
 
-测试：
-把从停掉
-主上insert，会被hang住
-金融行业要超时时间设置很大
+把从停掉，主上insert，会被hang住，金融行业要超时时间设置很大
