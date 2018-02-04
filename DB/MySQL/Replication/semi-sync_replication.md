@@ -145,7 +145,7 @@ Query OK, 0 rows affected (0.00 sec)
 
 ## Ⅲ、半同步原理浅析（两种模式）
 ### semi-sync replication
-半同步复制,一个事务提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示 收到了binlog ）后，方可继续下一个事务
+半同步复制,一个事务提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示收到了binlog ）后，方可继续下一个事务
 
 若在一定时间内（timeout）内没有收到ACK，则切换为异步模式，具体流程如下：
 
@@ -242,7 +242,7 @@ rpl_semi_sync_master_wait_for_slave_count
 
 建议设置从机数量的一半，类似group replication
 
-但gr并没有走mysqldump去发送日志，它有专门的端口号，专门的paxos做日志发送
+但gr并没有走mysqldump去发送日志，它有专门的端口号，专门的paxos做日志发送，logshipping
 ```
 
 ## Ⅳ、几种复制的性能对比
@@ -263,7 +263,7 @@ rpl_semi_sync_master_wait_for_slave_count
 
 开更多线程呢？1024个线程去压呢？
 
-半同步的性能会继续往上升，单个事务响应速度慢了，系统的整体吞吐率是上升的，所以生产环境中开启半同步，5.7场景打开after_sync (保证数据可靠性和性能的折中)
+半同步的性能会继续往上升，单个事务响应速度慢了，系统的整体吞吐率是上升的，所以生产环境中开启半同步，5.7场景打开after_sync(保证数据可靠性和性能的折中)
 
 所以，5.7不用gr就能保证主从数据一致性，只是gr在做选主的话变成全自动了，不用mha，但它现在也还有一些明显的限制
 
