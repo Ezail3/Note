@@ -125,4 +125,17 @@ tips:配置文件里都配上哈，主从都搞好
 | Rpl_semi_sync_master_status                | OFF     |
 +--------------------------------------------+---------+
 15 rows in set (0.00 sec)
+
+从：
+(root@localhost) [(none)]> start slave io_thread;
+Query OK, 0 rows affected (0.00 sec)
+
+主：
+恢复半同步，状态正常
 ```
+
+**半同步小结：**
+
+- 确保至少一个slave接收到日志
+- 一段时间内没接收到就切到异步
+- slave追上后又会自动切回半同步
