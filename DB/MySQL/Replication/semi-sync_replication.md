@@ -271,7 +271,7 @@ rpl_semi_sync_master_wait_for_slave_count
 从facebook测试结果看，after_commit性能很差，而无损复制比异步性能还好，为什么呢？
 - 就等待ACK回包问题上，其实两种复制的开销是一样的，没有区别，都是网络的等待开销
 - after_commit，主上一个事务等待提交的时候，不影响其他事务提交，性能一般
-- after_sync，一个事务卡住(waiting for semi-sync ack)，后面事务都在后面等着提交不了(query end,binlog已经传到从上了，等待第一个事务被唤醒，后面的所有事务一把fsync送给大家)，变相提高了第三步(innodb commit)组提交的效率，减少上下文切换，降低io开销，降低资源之间的竞争，提升磁盘吞吐率，性能较好
+- after_sync，一个事务卡住(waiting for semi-sync ack)，后面事务都在后面等着提交不了(query end，binlog已经传到从上了，等待第一个事务被唤醒，后面的所有事务一把fsync送给大家)，变相提高了第三步(innodb commit)组提交的效率，减少上下文切换，降低io开销，降低资源之间的竞争，提升磁盘吞吐率，性能较好
 - 线程数越多这种性能差距越明显
 
 **tips：**
