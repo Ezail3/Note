@@ -5,10 +5,9 @@
 ## Ⅰ、GTID的介绍
 - global transaction id identifier 全局事务id
 - gtid = server_uuid + transaction_id
-  
-server_uuid是全局唯一的，5.6开始才有，表示当前实例的uuid，保存在数据目录中的auto.conf文件中
-  
-transaction_id是自增的
+- server_uuid是全局唯一的，5.6开始才有，表示当前实例的uuid，保存在数据目录中的auto.conf文件中
+- transaction_id是自增的
+- gtid的作用是替代filename+ + position
 
 主：show master status;
 ```
@@ -26,8 +25,6 @@ Retrieved_Gtid_Set: d565cde8-0573-11e8-89b2-525400a4dac1:1
 Executed_Gtid_Set: d565cde8-0573-11e8-89b2-525400a4dac1:1
 也能看到事务号
 ```
-
-- gtid的作用是替代filename+ + position
 
 **tips：**
 如果做了A和B做了双主，B上一直在同步A上数据，这时候在B上写入一个事务
