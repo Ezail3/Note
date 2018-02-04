@@ -84,7 +84,11 @@ OFF                     彻底关闭GTID，如果关闭状态的备库收到带G
 
 开启gtid后，mysqldump备份单库时会报warning，意思是gtid包含所有事务，只备份了单库，忽略即可
 
-用mydumper备份，看下metadata文件，找到gitd：xxxxxx:x-xxx,等同于mysqdump备份文件中set @@global.gtid_purged='xxxx:x-xxx';表示这部分gtids对应的事务已经在备份中了，slave在还原备份后复制时，需要跳过这些gtids
+用mydumper备份，看下metadata文件，找到gitd：xxxxxx:x-xxx
+
+这玩意等同于mysqdump备份文件中set @@global.gtid_purged='xxxx:x-xxx';
+
+表示这部分gtids对应的事务已经在备份中了，slave在还原备份后复制时，需要跳过这些gtids
 
 ```
 reset master;   清空@@GLOBAL.GTID_EXECUTED，不然执行下一步会宝座
