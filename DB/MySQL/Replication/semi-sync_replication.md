@@ -275,9 +275,10 @@ rpl_semi_sync_master_wait_for_slave_count
 - 线程数越多这种性能差距越明显
 
 **tips：**
-ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
 
-开启半同步复制，sync_binlog可以不设为1来提升性能
+①ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
+
+②开启半同步复制，sync_binlog可以不设为1来提升性能
 
 错，除非是无损复制(日志先传到slave，sync_binlog可以不用持久化,那after_commit呢)
 
