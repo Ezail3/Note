@@ -117,6 +117,7 @@ Query OK, 0 rows affected (0.00 sec)
 ```
 
 - 执行一个空事务
+
 ```
 (root@localhost) [(none)]> begin;commit;
 Query OK, 0 rows affected (0.00 sec)
@@ -125,6 +126,7 @@ Query OK, 0 rows affected (0.00 sec)
 ```
 
 - 将gtid_next还原为automatic
+
 ```
 (root@localhost) [(none)]> set gtid_next="automatic";
 Query OK, 0 rows affected (0.00 sec)
