@@ -220,5 +220,9 @@ rpl_semi_sync_master_wait_for_slave_count = 1
 同样的测试，被hang住的那条插入，在主上是不可见的
 
 ### 小结对比
-|after_commit|afer_sync|
-|:-:|:-:|
+|半同步模式||等待ack时间点|数据一致性|
+|:-:|:-:|:-:|
+|after_commit|commit后|无法保证主从一致|
+|after_sync|写binlog后|主从一致|
+
+
