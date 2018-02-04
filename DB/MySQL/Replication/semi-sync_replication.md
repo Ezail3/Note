@@ -178,7 +178,7 @@ set global rpl_semi_sync_master_wait_point='after_commit';
 
 step2：
 主：
-set global rpl_semi_sync_master_timeout = 3600；  不让切异步
+set global rpl_semi_sync_master_timeout = 3600;  不让切异步
 create table a (a int primary key);
 从：
 stop io_thread;
