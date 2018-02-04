@@ -114,9 +114,7 @@ tips:配置文件里都配上哈，主从都搞好
 跑sysbench批量插入，show processlist可以看到全是query end，卡住了，搞不进去
 一会儿又恢复了
 原因：10s后，半同步切换为异步了
-此时主上看几个状态
-(root@localhost) [(none)]> show global status like 'rpl%';
-截取几个重要的状态
+此时主上看几个状态(截取几个重要的)
 (root@localhost) [(none)]> show global status like 'rpl%';
 +--------------------------------------------+---------+
 | Variable_name                              | Value   |
