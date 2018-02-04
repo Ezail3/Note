@@ -238,6 +238,8 @@ rpl_semi_sync_master_wait_for_slave_count
 
 之前的半同步是保证至少一个slave接收到binlog即可，这个参数可以设置多少个slave接收到日志主上才能commit
 
+配置多个ACK和配置一个ACK的效果是类似的，因为他们是并行执行的（理论上来说不会有两倍的等待时间），取决于最慢的那个
+
 建议设置从机数量的一半，类似group replication
 
 但gr并没有走mysqldump去发送日志，它有专门的端口号，专门的paxos做日志发送
@@ -267,10 +269,10 @@ rpl_semi_sync_master_wait_for_slave_count
 
 ### 再吹一手
 从facebook测试结果看，after_commit性能很差，而无损复制比异步性能还好，为什么呢？
+- 就等待ACK回包问题上，其实两种复制的开销是一样的，没有区别，都是网络的等待开销
 - after_commit，主上一个事务等待提交的时候，不影响其他事务提交，性能一般
-- after_sync，一个事务卡住，后面事务都在后面等着提交不了，变相提高了组提交的效率，减少上下文切换，降低资源之间的竞争，提升磁盘吞吐率，性能较好
+- after_sync，一个事务卡住(waiting for semi-sync ack)，后面事务都在后面等着提交不了(query end,binlog已经传到从上了，等待第一个事务被唤醒，后面的所有事务一把fsync送给大家)，变相提高了第三步(innodb commit)组提交的效率，减少上下文切换，降低io开销，降低资源之间的竞争，提升磁盘吞吐率，性能较好
+- 线程数越多这种性能差距越明显
 
-
-
-
+**tips：**
 ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
