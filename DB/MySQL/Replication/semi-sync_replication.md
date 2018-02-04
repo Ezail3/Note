@@ -142,3 +142,42 @@ Query OK, 0 rows affected (0.00 sec)
 - slave追上后又会自动切回半同步
 
 ## Ⅲ、半同步原理浅析（两种模式）
+### semi-sync replication
+半同步复制,一个事物提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示 收到了binlog ）后，方可继续下一个事物
+
+若在一定时间内（Timeout）内没有收到ACK，则切换为异步模式，具体流程如下：
+
+```
+next commit <-+
+              |   
++---------+   |      +--------+
+|    M    |   |      |        |
+| prepare |   +------+        |
++----v----+          |        |
+|  binary | Wait Ack |   S    |
++----v----+   +------>        |
+|  commit |   |      |        |
++----v----+   |      +--------+ 
+	 |        |
+	 +--------+
+```
+
+演示：
+```
+step1:
+5.7默认是无损复制，先设一把普通半同步
+主：
+set global rpl_semi_sync_master_wait_point='after_commit';
+
+step2：
+主：
+set global rpl_semi_sync_master_timeout = 3600；  不让切异步
+create table a (a int primary key);
+从：
+stop io_thread;
+
+step3：
+主：
+insert into a values(1);hang住咯
+新开个线程，可以看到这条记录
+```
