@@ -92,6 +92,15 @@ tips:配置文件里都配上哈，主从都搞好
 
 这里面有一个超时，默认10s
 
+如果超时了，会切为异步
+
+相关参数：rpl_semi_sync_master_timeout
+
+
+**测试一把：**
+
+把从停掉（stop slave io_thread），主上insert，会被hang住，金融行业要超时时间设置很大
+
 主发给从，从没接收到，主提交不了
 ```
 (root@localhost) [(none)]> show processlist;
@@ -101,13 +110,21 @@ tips:配置文件里都配上哈，主从都搞好
 | 1460 | root | localhost | NULL | Query   |    0 | starting                             | show processlist                      |
 | 1461 | root | localhost | test | Query   |    7 | Waiting for semi-sync ACK from slave | insert into flashback values(6,7,8,9) |
 +------+------+-----------+------+---------+------+--------------------------------------+---------------------------------------+
+
+跑sysbench批量插入，show processlist可以看到全是query end，卡住了，搞不进去
+一会儿又恢复了
+原因：10s后，半同步切换为异步了
+此时主上看几个状态
+(root@localhost) [(none)]> show global status like 'rpl%';
+截取几个重要的状态
+(root@localhost) [(none)]> show global status like 'rpl%';
++--------------------------------------------+---------+
+| Variable_name                              | Value   |
++--------------------------------------------+---------+
+| Rpl_semi_sync_master_clients               | 0       |
+| Rpl_semi_sync_master_no_times              | 1       |    # 半同步切异步的次数
+| Rpl_semi_sync_master_no_tx                 | 6588    |    # 切为异步后执行的事务数
+| Rpl_semi_sync_master_status                | OFF     |
++--------------------------------------------+---------+
+15 rows in set (0.00 sec)
 ```
-
-如果超时了，会切为异步
-
-相关参数：rpl_semi_sync_master_timeout
-
-
-**测试一把：**
-
-把从停掉，主上insert，会被hang住，金融行业要超时时间设置很大
