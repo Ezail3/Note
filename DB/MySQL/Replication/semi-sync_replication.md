@@ -205,7 +205,7 @@ insert into a values(1);hang住咯
 |  commit |          |        |
 +----+----+          +--------+ 
      |
-	   v
+     v
   next commit
 
 [mysqld]
@@ -216,3 +216,5 @@ rpl_semi_sync_master_wait_for_slave_count = 1
 对比after_commit测试
 
 同样的测试，被hang住的那条插入，在主上是不可见的
+
+### 小结对比
