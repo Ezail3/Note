@@ -6,9 +6,9 @@
 - global transaction id identifier 全局事务id
 - gtid = server_uuid + transaction_id
   
-  server_uuid是全局唯一的，5.6开始才有，表示当前实例的uuid，保存在数据目录中的auto.conf文件中
+server_uuid是全局唯一的，5.6开始才有，表示当前实例的uuid，保存在数据目录中的auto.conf文件中
   
-  transaction_id是自增的
+transaction_id是自增的
 
 主：show master status;
 ```
