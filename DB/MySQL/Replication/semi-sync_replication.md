@@ -276,3 +276,13 @@ rpl_semi_sync_master_wait_for_slave_count
 
 **tips：**
 ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
+
+开启半同步复制，sync_binlog可以不设为1来提升性能
+
+错，除非是无损复制(日志先传到slave，sync_binlog可以不用持久化,那after_commit呢)
+
+如果master宕机了，sync_binlog日志没落盘，redo里面有日志，这时候重启就会回滚事务，
+
+回滚后，那slave上又有这个事务，这样就主从不一致了
+
+这种说法，每次主起来的时候需要把从上面的binlog补过来，这个很复杂，很少有人可以做，很难
