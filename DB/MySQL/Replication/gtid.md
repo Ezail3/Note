@@ -1,1 +1,62 @@
-xxx
+之前的复制基于(file,pos)
+当主从发生宕机，切换的时候有问题
+slave保存的是原master上的(file,pos)
+无法直接指向新master上的(file,pos)
+mha通过relay log来判断(非常有技术性)
+
+举例：
+a是master
+b c d是slave
+a挂了
+b做主，c d做change master
+此时c d 上的pos却还是a上面的pos，和b没有对应关系，文件名，文件大小，position完全不一样，change不起来
+
+GTID
+Global Transaction Identifier
+uuid+transactionid
+tips：server_uuid从5.6开始有的，表示当前MySQL实例的uuid
+show variables like 'server_uuid';
+主：show master status;
+Executed_Gtid_set：server_id:1-xxxx     表示产生了xxx个事务
+从：show master status;
+也能看到事务号
+
+如果做了A和B做了双主
+B上一直在同步A上数据，这时候在B上写入一个事务
+A上看下Executed_Gtid_set，会发现又两个值
+一个是自己做主当前的事务号，一个是同步的从上的事务号
+
+using GTID replace(filename,position)
+
+真正的全局唯一位置(所有机器上都是统一的)
+更容易进行failover操作
+
+gtid配置
+[mysqld]
+log_bin
+gtid_mode = ON
+log_slave_updates = 1          5.6必须开，5.7可以不开
+enforce-gtid-consistency = 1
+
+change master to master_host='xxx',master_user='xxx',master_password='xxx' ,MASTER_AUTO_POSITION=1 ;
+
+注意：
+MySQL5.6必须开启参数log_slave_updates
+MySQL5.6升级到gtid模式需要停机重启
+
+MySQL5.7版本开始可以不开启log_slvae_updates
+MySQL5.7.6版本开始可以在线升级gtid模式
+
+5.6中gtid用的比较少，最重要的原因在于gtid要么开要么不开，不能做到非gtid升级到gtid
+5.7.6可以在线升级
+
+5.7的gtid_mode可选值
+ON                               完全打开GTID，如果打开状态的备库接受到不带GTID的事务，则复制中断
+ON_PERMISSIVE           可以认为是打开gtid前的过渡阶段，主库在设置成该值后会产生GTID，同时备库依然容忍带GTID和不带GTID的事务
+OFF_PERMISSIVE          可以认为是关闭GTID前的过渡阶段，主库在设置成该值后不再生成GTID,备库在接受到带GTID和不带GTID事务都可以容忍
+                                     主库在关闭GTID时，执行事务会产生一个Anonymous_Gtid事件，会在备库执行：set @@session.gtid_next='anonymous'
+OFF                              彻底关闭GTID，如果关闭状态的备库收到带GTID的事务，则复制中断
+之前只有ON和OFF
+
+gtid是一切高可用基础(gr,mha),强烈建议打开，5.6就有了，很成熟了
+基于组提交，gtid是个必须的条件
