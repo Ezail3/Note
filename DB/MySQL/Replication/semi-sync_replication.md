@@ -63,7 +63,8 @@ step2：
 (root@localhost) [(none)]> set global rpl_semi_sync_master_enabled = 1;
 (root@localhost) [(none)]> set global rpl_semi_sync_slave_enabled = 1;
 
-tips:配置文件里都配上哈，主从都搞好
+tips:
+配置文件里都配上哈，主从都搞好
 
 重启一下复制
 主上执行
@@ -139,3 +140,5 @@ Query OK, 0 rows affected (0.00 sec)
 - 确保至少一个slave接收到日志
 - 一段时间内没接收到就切到异步
 - slave追上后又会自动切回半同步
+
+## Ⅲ、半同步原理浅析（两种模式）
