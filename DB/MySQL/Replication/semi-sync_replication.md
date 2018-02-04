@@ -181,7 +181,7 @@ step2：
 set global rpl_semi_sync_master_timeout = 3600;  不让切异步
 create table a (a int primary key);
 从：
-stop io_thread;
+stop slave io_thread;
 
 step3：
 主：
