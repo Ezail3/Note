@@ -93,7 +93,7 @@ tips:配置文件里都配上哈，主从都搞好
 这里面有一个超时，默认10s
 
 主发给从，从没接收到，主提交不了
-
+```
 (root@localhost) [(none)]> show processlist;
 +------+------+-----------+------+---------+------+--------------------------------------+---------------------------------------+
 | Id   | User | Host      | db   | Command | Time | State                                | Info                                  |
@@ -101,6 +101,7 @@ tips:配置文件里都配上哈，主从都搞好
 | 1460 | root | localhost | NULL | Query   |    0 | starting                             | show processlist                      |
 | 1461 | root | localhost | test | Query   |    7 | Waiting for semi-sync ACK from slave | insert into flashback values(6,7,8,9) |
 +------+------+-----------+------+---------+------+--------------------------------------+---------------------------------------+
+```
 
 如果超时了，会切为异步
 
