@@ -185,8 +185,7 @@ slave_parallel_workers        0表示只有1个线程，可以动态设置，但
 
 - 5.7支持并行复制模式设置           
 ```
-slave_parallel_type
-set global slave_parallel_type=logical_clock
+slave_parallel_type=logical_clock
 配置很简单，性能很棒棒，主上面怎么并行，从上面就怎么回放，基于逻辑时钟的概念
 5.7才有，5.7.19之前有bug，会导致主从不一致，慎用
 ```
