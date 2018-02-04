@@ -95,3 +95,44 @@ SET @@GLOBAL.GTID_PURGED = '找出来的位置'
 change master to master_host='127.0.0.1', master_port=3306, master_user='rpl', master_password='123', MASTER_AUTO_POSITION=1;
 start slave;
 ```
+
+**tips:**
+
+- binlog文件中会有两个关于gtid的event——Previous_gtids和Gtid
+- 通过扫描binlog中的gtid值，可以知道gtid与filename-pos的对应关系，如果binlog很大，扫描量也很大，所以用Previous_gtid来记录之前一个binlog文件中最大的gtid
+- 如果要找的gtid比previous_gtids大，就扫描当前文件，反之扫之前的文件，依次类推
+- binlog在routate的时候，是知道当前最大gitd的，将该值，写入下个binlog的文件头，即previous_gtids
+
+## Ⅴ、gtid复制中处理报错小技巧
+这里模拟一个1062错误即可，不演示
+
+报错会告诉你对应的gtid
+
+操作步骤如下：
+- 我们将gtid_next指向报错的gtid
+
+```
+(root@localhost) [(none)]> set gtid_next='xxxxxx:xxxx'; -- 设置为之前失败的那个GTID的值
+Query OK, 0 rows affected (0.00 sec)
+```
+
+- 执行一个空事务
+```
+(root@localhost) [(none)]> begin;commit;
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+```
+
+- 将gtid_next还原为automatic
+```
+(root@localhost) [(none)]> set gtid_next="automatic";
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> stop slave;
+Query OK, 0 rows affected (0.01 sec)
+(root@localhost) [(none)]> start slave;
+Query OK, 0 rows affected (0.07 sec)
+```
+
+该操作类似于sql_slave_skip_counter，只是跳过错误，不能保证数据一致性，需要人工介入，固强烈建议从机开启read_only=1
