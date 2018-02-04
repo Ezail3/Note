@@ -143,13 +143,13 @@ Query OK, 0 rows affected (0.00 sec)
 
 ## Ⅲ、半同步原理浅析（两种模式）
 ### semi-sync replication
-半同步复制,一个事物提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示 收到了binlog ）后，方可继续下一个事物
+半同步复制,一个事务提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示 收到了binlog ）后，方可继续下一个事务
 
-若在一定时间内（Timeout）内没有收到ACK，则切换为异步模式，具体流程如下：
+若在一定时间内（timeout）内没有收到ACK，则切换为异步模式，具体流程如下：
 
 ```
 next commit <-+
-              |   
+              |Recv ACK   
 +---------+   |      +--------+
 |    M    |   |      |        |
 | prepare |   +------+        |
@@ -160,9 +160,14 @@ next commit <-+
 +----v----+   |      +--------+ 
      |        |
      +--------+
+     
+[mysqld]
+rpl_semi_sync_master_enabled = 1
+rpl_semi_sync_slave_enabled = 1
+rpl_semi_sync_master_timeout = 1000
 ```
 
-演示：
+测试：
 ```
 step1:
 5.7默认是无损复制，先设一把普通半同步
@@ -179,5 +184,35 @@ stop io_thread;
 step3：
 主：
 insert into a values(1);hang住咯
-新开个线程，可以看到这条记录
+新开个线程，但可以看到这条记录
 ```
+### loss less semi-sync replication
+无损复制，一个事务提交（commit）时，在server层的write binlog步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示收到了binlog ）后，才能继续下一个事务
+
+如果在一定时间内（timeout）内没有收到ACK ，则切换为异步模式 ，具体流程如下：
+```
++---------+          +--------+
+|    M    |          |        |
+| prepare |          |        |
++----v----+          |        |
+|  binary | +-------->        |
++----v----+ |Wait ACK|        |
+|    |    | |        |    S   |
+|    +------+        |        |
+|         |          |        |
+|    +---------------<        |        
+|    v    | Recv ACK |        |
+|  commit |          |        |
++----+----+          +--------+ 
+     |
+	   v
+  next commit
+
+[mysqld]
+rpl_semi_sync_master_wait_point = afer_sync
+rpl_semi_sync_master_wait_for_slave_count = 1
+```
+
+对比after_commit测试
+
+同样的测试，被hang住的那条插入，在主上是不可见的
