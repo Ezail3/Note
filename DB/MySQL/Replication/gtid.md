@@ -52,7 +52,7 @@ a是master，b c d是slave，a挂了，b做主，c d做change master
 
 使用gtid的话，b上保存这c和d回放的位置G_a、G_b(b是通过选举出来的，保存着最多的日志)
 
-Ⅲ、gtid配置
+## Ⅲ、gtid配置
 ```
 [mysqld]
 log_bin
@@ -63,24 +63,20 @@ enforce-gtid-consistency = 1
 change master to master_host='127.0.0.1', master_port=3306, master_user='rpl', master_password='123', MASTER_AUTO_POSITION=1;
 ```
 
+**tips：**
 
-注意：
-MySQL5.6必须开启参数log_slave_updates
-MySQL5.6升级到gtid模式需要停机重启
+- MySQL5.6必须开启参数log_slave_updates,5.7.6开始无需配置
+- MySQL5.6升级到gtid模式需要停机重启
+- MySQL5.7.6版本开始可以在线升级gtid模式
+- 5.6中gtid用的比较少，最重要的原因在于gtid要么开要么不开，不能做到非gtid升级到gtid
+- gtid是一切高可用基础(gr,mha),强烈建议打开，5.6就有了，很成熟了
 
-MySQL5.7版本开始可以不开启log_slvae_updates
-MySQL5.7.6版本开始可以在线升级gtid模式
-
-5.6中gtid用的比较少，最重要的原因在于gtid要么开要么不开，不能做到非gtid升级到gtid
-5.7.6可以在线升级
-
+```
 5.7的gtid_mode可选值
-ON                               完全打开GTID，如果打开状态的备库接受到不带GTID的事务，则复制中断
+ON                      完全打开GTID，如果打开状态的备库接受到不带GTID的事务，则复制中断
 ON_PERMISSIVE           可以认为是打开gtid前的过渡阶段，主库在设置成该值后会产生GTID，同时备库依然容忍带GTID和不带GTID的事务
 OFF_PERMISSIVE          可以认为是关闭GTID前的过渡阶段，主库在设置成该值后不再生成GTID,备库在接受到带GTID和不带GTID事务都可以容忍
-                                     主库在关闭GTID时，执行事务会产生一个Anonymous_Gtid事件，会在备库执行：set @@session.gtid_next='anonymous'
-OFF                              彻底关闭GTID，如果关闭状态的备库收到带GTID的事务，则复制中断
+                        主库在关闭GTID时，执行事务会产生一个Anonymous_Gtid事件，会在备库执行：set @@session.gtid_next='anonymous'
+OFF                     彻底关闭GTID，如果关闭状态的备库收到带GTID的事务，则复制中断
 之前只有ON和OFF
-
-gtid是一切高可用基础(gr,mha),强烈建议打开，5.6就有了，很成熟了
-基于组提交，gtid是个必须的条件
+```
