@@ -267,6 +267,9 @@ rpl_semi_sync_master_wait_for_slave_count
 
 ### 再吹一手
 从facebook测试结果看，after_commit性能很差，而无损复制比异步性能还好，为什么呢？
+- after_commit，主上一个事务等待提交的时候，不影响其他事务提交，性能一般
+- after_sync，一个事务卡住，后面事务都在后面等着提交不了，变相提高了组提交的效率，减少上下文切换，降低资源之间的竞争，提升磁盘吞吐率，性能较好
+
 
 
 
