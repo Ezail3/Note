@@ -59,8 +59,6 @@ log_bin
 gtid_mode = ON
 log_slave_updates = 1          5.6必须开，5.7可以不开
 enforce-gtid-consistency = 1
-
-change master to master_host='127.0.0.1', master_port=3306, master_user='rpl', master_password='123', MASTER_AUTO_POSITION=1;
 ```
 
 **tips：**
@@ -79,4 +77,21 @@ OFF_PERMISSIVE          可以认为是关闭GTID前的过渡阶段，主库在�
                         主库在关闭GTID时，执行事务会产生一个Anonymous_Gtid事件，会在备库执行：set @@session.gtid_next='anonymous'
 OFF                     彻底关闭GTID，如果关闭状态的备库收到带GTID的事务，则复制中断
 之前只有ON和OFF
+```
+
+## Ⅳ、简单说下搭建过程
+大同小异，全备+binlog
+
+开启gtid后，mysqldump备份单库时会报warning，意思是gtid包含所有事务，只备份了单库，忽略即可
+
+用mydumper备份，看下metadata文件，找到gitd：xxxxxx:x-xxx,等同于mysqdump备份文件中set @@global.gtid_purged='xxxx:x-xxx';表示这部分gtids对应的事务已经在备份中了，slave在还原备份后复制时，需要跳过这些gtids
+
+```
+reset master;   清空@@GLOBAL.GTID_EXECUTED，不然执行下一步会宝座
+SET @@GLOBAL.GTID_PURGED = '找出来的位置'
+以上操作mysqldump出来的文件导入无需操作，mydumper要手动，因为myloader不执行这个
+
+最后一把change master送给大家
+change master to master_host='127.0.0.1', master_port=3306, master_user='rpl', master_password='123', MASTER_AUTO_POSITION=1;
+start slave;
 ```
