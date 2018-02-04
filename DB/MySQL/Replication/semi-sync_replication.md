@@ -102,7 +102,7 @@ tips:
 
 **测试一把：**
 
-把从停掉（stop slave io_thread），主上insert，会被hang住，金融行业要超时时间设置很大
+把从停掉（stop slave io_thread），主上insert，会被hang住，金融行业要超时时间设置很大，不让切异步，人工介入
 
 主发给从，从没接收到，主提交不了
 ```
@@ -226,4 +226,12 @@ rpl_semi_sync_master_wait_for_slave_count = 1
 |after_commit|commit后|无法保证主从一致|
 |after_sync|写binlog后|主从一致|
 
+**tips：**
 
+5.7新参数
+```
+rpl_semi_sync_master_wait_for_slave_count
+之前的半同步是保证至少一个slave接收到binlog即可，这个参数可以设置多少个slave接收到日志主上才能commit
+建议设置从机数量的一半，类似group replication
+但gr并没有走mysqldump去发送日志，它有专门的端口号，专门的paxos做日志发送
+```
