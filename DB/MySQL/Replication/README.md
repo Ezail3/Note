@@ -10,8 +10,11 @@
 
 [5、基于gtid的复制][5]
 
+[6、多源复制][6]
+
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/about_binlog.md
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/replication_basic.md
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/replication_advanced.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/semi-sync_replication.md
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/gtid.md
+  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/channels.md
