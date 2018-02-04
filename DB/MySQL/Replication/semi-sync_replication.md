@@ -18,7 +18,7 @@
 
 ### lossless semi-syncreplication
 
-- 二进制日志先写远程
+- 二进制日志先写远端
 - 可保证数据完全不丢失
 - MySQL5.7版本开始支持
 
