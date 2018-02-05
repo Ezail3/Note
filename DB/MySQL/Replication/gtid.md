@@ -119,7 +119,7 @@ start slave;
 报错中没有gtid，则用Retrieved_Gtid_Set和Executed_Gtid_Set对比一下就知道哪个事务执行出错了
 
 ```
-(root@localhost) [(none)]> set gtid_next='xxxxxx:xxxx'; -- 设置为之前失败的那个GTID的值
+(root@localhost) [(none)]> set gtid_next='xxxxxx:xxxx';  # 设置为之前失败的那个GTID的值
 Query OK, 0 rows affected (0.00 sec)
 ```
 
