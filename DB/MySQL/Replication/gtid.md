@@ -149,7 +149,3 @@ Query OK, 0 rows affected (0.07 sec)
 ## Ⅵ、GTID的限制
 - 在开启GTID后，不能在一个事物中使用创建临时表的语句，需要使得 autocommit=1;才可以。5.7开始直接创建临时表已经可以创建了
 - 在开启GTID后，不能使用create table select ... 的语法来创建表了，因为这其实是多个事物了，GTID没法对应
-
-## Ⅶ、其他注意点
-reset slave all 
-使用该命令时不会清空数据，仅仅是清空show slave status\G里面的信息，所以在使用该命令之前，请先记录（备份）show slave status\G 的信息
