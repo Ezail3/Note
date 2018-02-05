@@ -19,5 +19,5 @@
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/replication_advanced.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/semi-sync_replication.md
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/gtid.md
-  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/channels.md
+  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/channels_cascading.md
   [7]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Replication/double_master.md
