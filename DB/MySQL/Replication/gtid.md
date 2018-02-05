@@ -27,6 +27,7 @@ Executed_Gtid_Set: d565cde8-0573-11e8-89b2-525400a4dac1:1
 ```
 
 **tips：**
+
 如果做了A和B做了双主，B上一直在同步A上数据，这时候在B上写入一个事务
 
 A上看下Executed_Gtid_set，会发现又两个值
