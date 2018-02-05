@@ -108,13 +108,15 @@ start slave;
 - 如果要找的gtid比previous_gtids大，就扫描当前文件，反之扫之前的文件，依次类推
 - binlog在routate的时候，是知道当前最大gitd的，将该值，写入下个binlog的文件头，即previous_gtids
 
-## Ⅴ、gtid复制中处理报错小技巧
+## Ⅴ、GTID复制中处理报错小技巧
 这里模拟一个1062错误即可，不演示
 
 报错会告诉你对应的gtid
 
 操作步骤如下：
 - 我们将gtid_next指向报错的gtid
+
+报错中没有gtid，则用Retrieved_Gtid_Set和Executed_Gtid_Set对比一下就知道哪个事务执行出错了
 
 ```
 (root@localhost) [(none)]> set gtid_next='xxxxxx:xxxx'; -- 设置为之前失败的那个GTID的值
@@ -143,3 +145,11 @@ Query OK, 0 rows affected (0.07 sec)
 ```
 
 该操作类似于sql_slave_skip_counter，只是跳过错误，不能保证数据一致性，需要人工介入，固强烈建议从机开启read_only=1
+
+## Ⅵ、GTID的限制
+- 在开启GTID后，不能在一个事物中使用创建临时表的语句，需要使得 autocommit=1;才可以。5.7开始直接创建临时表已经可以创建了
+- 在开启GTID后，不能使用create table select ... 的语法来创建表了，因为这其实是多个事物了，GTID没法对应
+
+## Ⅶ、其他注意点
+reset slave all 
+使用该命令时不会清空数据，仅仅是清空show slave status\G里面的信息，所以在使用该命令之前，请先记录（备份）show slave status\G 的信息
