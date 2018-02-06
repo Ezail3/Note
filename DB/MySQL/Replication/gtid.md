@@ -106,7 +106,7 @@ start slave;
 - binlog文件中会有两个关于gtid的event——Previous_gtids和Gtid
 - 通过扫描binlog中的gtid值，可以知道gtid与filename-pos的对应关系，如果binlog很大，扫描量也很大，所以用Previous_gtid来记录之前一个binlog文件中最大的gtid
 - 如果要找的gtid比previous_gtids大，就扫描当前文件，反之扫之前的文件，依次类推
-- binlog在routate的时候，是知道当前最大gitd的，将该值，写入下个binlog的文件头，即previous_gtids
+- binlog在rotate的时候，是知道当前最大gtid的，将该值，写入下个binlog的文件头，即previous_gtids
 
 ## Ⅴ、GTID复制中处理报错小技巧
 这里模拟一个1062错误即可，不演示
