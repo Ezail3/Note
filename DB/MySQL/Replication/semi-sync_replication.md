@@ -276,9 +276,11 @@ rpl_semi_sync_master_wait_for_slave_count
 
 **tips：**
 
-①ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
+①为什么after_sync会堆积事务，据说是等待ack的一个改进(同一组提交的事务只起专门的一个线程等待ack，同组的事务再每个事务起一个线程等待)，这块待确认
 
-②开启半同步复制，sync_binlog可以不设为1来提升性能
+②ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
+
+③开启半同步复制，sync_binlog可以不设为1来提升性能
 
 错，除非是无损复制(日志先传到slave，sync_binlog可以不用持久化,那after_commit呢)
 
@@ -288,4 +290,4 @@ rpl_semi_sync_master_wait_for_slave_count
 
 这种说法，每次主起来的时候需要把从上面的binlog补过来，这个很复杂，很少有人可以做，很难
 
-③线上环境可以配置成两台Slave做无损复制（保证数据不丢），其他的Slave做异步复制（配置为只读，用于负载均衡），都指向同一台Master
+④线上环境可以配置成两台Slave做无损复制（保证数据不丢），其他的Slave做异步复制（配置为只读，用于负载均衡），都指向同一台Master
