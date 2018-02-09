@@ -151,6 +151,8 @@ tips:
 
 - flashback仅支持DML操作的闪回，不支持ddl
 
+- 实例开启gtid的情况下，不支持flashback
+
 - 同一事务中的DML语句不仅闪回，语句执行顺序也会倒过来(有兴趣的可以测试，篇幅原因只贴了一个delete操作)
 
 **tips：**
