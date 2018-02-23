@@ -276,7 +276,7 @@ rpl_semi_sync_master_wait_for_slave_count
 
 **tips：**
 
-①为什么after_sync会堆积事务，据说是等待ack的一个改进(同一组提交的事务只起专门的一个线程等待ack，而不再是每个事务都起一个线程等待)，这块待确认
+①为什么after_sync会堆积事务？(这块暂时没搞清楚，后续研究一下)
 
 ②ping值返回0.1ms是个什么水准？千兆网的速度，万兆网0.01ms的样子
 
