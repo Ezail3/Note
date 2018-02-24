@@ -274,6 +274,35 @@ rpl_semi_sync_master_wait_for_slave_count
 - after_sync，一个事务卡住(waiting for semi-sync ack)，后面事务都是query end状态(执行中，没在等ack，binlog已经传到从上了，等待第一个事务被唤醒，后面的所有事务一起做最后一次fsync)，变相提高了第三步(innodb commit)组提交的效率，减少上下文切换，降低io开销，降低资源之间的竞争，提升磁盘吞吐率，性能较好
 - 线程数越多这种性能差距越明显
 
+**对比测试如下：**
+
+```
+after_commit
+(root@localhost) [(none)]> show processlist;
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+| Id    | User | Host      | db   | Command | Time | State                                | Info                      |
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+| 14905 | root | localhost | test | Query   |   14 | Waiting for semi-sync ACK from slave | insert into abc values(1) |
+| 14906 | root | localhost | test | Query   |   10 | Waiting for semi-sync ACK from slave | insert into abc values(2) |
+| 14907 | root | localhost | test | Query   |    7 | Waiting for semi-sync ACK from slave | insert into abc values(3) |
+| 14908 | root | localhost | test | Query   |    4 | Waiting for semi-sync ACK from slave | insert into abc values(4  |
+| 14909 | root | localhost | NULL | Query   |    0 | starting                             | show processlist          |
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+5 rows in set (0.00 sec)
+
+after_sync
+(root@localhost) [(none)]> show processlist;
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+| Id    | User | Host      | db   | Command | Time | State                                | Info                      |
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+| 14905 | root | localhost | test | Query   |   57 | Waiting for semi-sync ACK from slave | insert into abc values(1) |
+| 14906 | root | localhost | test | Query   |   37 | query end                            | insert into abc values(2) |
+| 14907 | root | localhost | test | Query   |   29 | query end                            | insert into abc values(3) |
+| 14908 | root | localhost | test | Query   |   21 | query end                            | insert into abc values(4) |
+| 14909 | root | localhost | NULL | Query   |    0 | starting                             | show processlist          |
++-------+------+-----------+------+---------+------+--------------------------------------+---------------------------+
+```
+
 **tips：**
 
 ①为什么after_sync会堆积事务？ 这种情况下主接受ack是在一个串行锁的保护下进行的，通过pstack抓线程栈可以看得很清楚，这一点after_commit没有
