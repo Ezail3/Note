@@ -51,6 +51,8 @@ mysql> show slave status for channel 'ch1'\G
 - 库的拆分，某库压力很大，可以使用级联复制将其独立出去
 
 ### 部署
+在B上开启log_slave_updates，记录binlog
+
 大同小异，不弄了
 
 这块内容了解即可，总体没什么难度
