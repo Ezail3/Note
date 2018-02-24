@@ -305,7 +305,7 @@ after_sync
 
 **tips：**
 
-①为什么after_sync会堆积事务？ 这种情况下主接受ack是在一个串行锁的保护下进行的，通过pstack抓线程栈可以看得很清楚，这一点after_commit没有
+①为什么after_sync会堆积事务？ 这种情况下主接受ack是在一个串行锁(LOCK_COMMIT)的保护下进行的，通过pstack抓线程栈可以看得很清楚，这一点after_commit没有
 
 ②ping值返回0.1ms是个什么水准？ 千兆网的速度，万兆网0.01ms的样子
 
