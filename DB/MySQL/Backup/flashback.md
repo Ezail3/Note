@@ -140,7 +140,7 @@ tips:
 ```
 
 ## Ⅲ、关于flashback回放的位置点
-假设Master宕机切到了Slave，Master恢复后，可能需要将部分数据Flashback掉(宕机前最后一部分未传过去的binlog)，Flashback掉的位置很关键，这个位置一般 以Slave上SQL线程最终回放完的位置为准
+假设Master宕机切到了Slave，Master恢复后，可能需要将部分数据Flashback掉(宕机前最后一部分未传过去的binlog)，Flashback掉的位置很关键，这个位置一般以Slave上SQL线程最终回放完的位置为准
 
 ## Ⅳ、相关小结
 - flashback是基于binlog的逆操作(逻辑)，Oracle的闪回是基于undo做的(物理)
