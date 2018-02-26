@@ -47,8 +47,8 @@
 
 ①共享表空间(最早只有这个)
 - 存储元数据信息
-- Change Buffer
-- Undo
+- 存储Change Buffer信息
+- 存储Undo信息
 - 一开始所有的表和索引的信息都是存储在共享表空间中,随后InnoDB对其做了改进，可以使用独立的表空间
 
 ②独立表空间
@@ -61,6 +61,24 @@
 - innodb_undo_tablespaces(该值8.0开始将会被剔除，不可修改，默认写死，为2)
 
 ④临时表空间
+- MySQL5.7增加了临时表空间（ibtmp1）
+- innodb_temp_data_file_path
 
+### 看下数据目录
+```
+[root@VM_0_5_centos data3306]# ll ib*
+-rw-r----- 1 mysql mysql    16285 Feb  4 18:15 ib_buffer_pool
+-rw-r----- 1 mysql mysql 79691776 Feb 24 10:53 ibdata1          #共享表空间
+-rw-r----- 1 mysql mysql 50331648 Feb 24 10:53 ib_logfile0      #重做日志
+-rw-r----- 1 mysql mysql 50331648 Feb  4 15:06 ib_logfile1    
+-rw-r----- 1 mysql mysql 12582912 Feb 24 10:14 ibtmp1           #临时表空间
+
+[root@VM_0_5_centos data3306]# cd test
+[root@VM_0_5_centos test]# ll
+total 228
+-rw-r----- 1 mysql mysql       65 Feb  4 13:21 db.opt           #记录默认字符集和字符集排序规则
+-rw-r----- 1 mysql mysql  8554 Feb  1 15:45 abc.frm             #表结构文件
+-rw-r----- 1 mysql mysql 98304 Feb 24 10:53 abc.ibd             #独立表空间
+```
 
 ## Ⅳ、逻辑存储结构
