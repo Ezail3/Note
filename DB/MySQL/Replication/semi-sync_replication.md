@@ -12,14 +12,12 @@
 到5.7版本，在原来半同步的基础上又出了一种半同步，叫无损复制,所以目前有两种半同步模式如下：
 
 ### semi-syncreplication
-
 - 至少有一个从机收到binlog再返回
 - 减少数据丢失风险
 - 不能完全避免数据丢失
 - MySQL5.5版本开始支持
 
 ### lossless semi-syncreplication
-
 - 二进制日志先写远端
 - 可保证数据完全不丢失
 - MySQL5.7版本开始支持
@@ -248,7 +246,6 @@ rpl_semi_sync_master_wait_for_slave_count
 ## Ⅳ、几种复制的性能对比
 ### 先吹两手
 异步复制和半同步复制(无损)的性能差多少？
-
 - 只读的情况下，性能一样，因为没有产生二进制日志，谈不上主从
 - oltp脚本（14个select，4个update）跑，性能其实也差不多
 - update_none_index测试，差的也不多，百分之十的样子
