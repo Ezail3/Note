@@ -4,7 +4,6 @@
 
 ## Ⅰ、传统姿势
 这种方法需要提前设置一个参数
-
 - secure_file_priv
 
 |value|meaning|
@@ -96,7 +95,6 @@ tips：ignore N lines 可指定不到如前N行
 地理空间的数据类型，列比较特殊，geometry的列，导出的话是一个经度和纬度，导入的时候就要用set a = geometry(a,b);
 
 ### load data的缺点
-
 - 针对文本文件，会有限制，比如一篇博客，有很多字符，逗号，tab，等等
 
 其实可以搞成十六进制，再导入进去，但是比较烦
