@@ -228,7 +228,7 @@ Page Number        |      0     |      1     |      2      |            |     M 
 
 ```
 
-- 每次读取Page时，都是通过SpaceID和PageNumber进行读取；
+- 每次读取Page时，都是通过SpaceID和PageNumber进行读取
 - 可以简单理解为从表空间的开头读多少个PageNumber * PageSize的字节（偏移）
 - 想成数组，数组的名字就是SpaceID，数组的下标就是PageNumber
 - 在一个SpaceID（ibd文件）中，PageNumber是唯一且自增的
