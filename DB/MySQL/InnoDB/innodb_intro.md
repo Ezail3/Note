@@ -57,6 +57,8 @@
 - 分区表可以对应多个ibd文件
 
 undo表空间
+- MySQL5.6版本支持独立的Undo表空间
+- innodb_undo_tablespaces
 
 临时表空间
 
