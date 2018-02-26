@@ -148,7 +148,9 @@ page_size=16K 就是1M * 1024 / 16 = 64个页
 
 等价于ORACLE中的块 ,最小的I/O操作单位
 
-  data的最小单位不是页，而是页中的记录(row)
+**tips:**
+
+data的最小单位不是页，而是页中的记录(row)
 
 普通用户表中MySQL默认的每个页为16K
 - 从MySQL5.6开始使用 innodb_page_size可以控制页大小
