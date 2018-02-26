@@ -78,6 +78,23 @@ OFF_PERMISSIVE          可以认为是关闭GTID前的过渡阶段，主库在�
                         主库在关闭GTID时，执行事务会产生一个Anonymous_Gtid事件，会在备库执行：set @@session.gtid_next='anonymous'
 OFF                     彻底关闭GTID，如果关闭状态的备库收到带GTID的事务，则复制中断
 之前只有ON和OFF
+
+平滑开启gtid
+set global gtid_mode = 'off_permissive';
+set global gtid_mode = 'on_permissive';
+set global enforce_gtid_consistency = 'on'
+set global gtid_mode = 'ON';
+
+平滑关闭gtid
+stop slave;
+set global gtid_mode = 'on_permissive';
+set global gtid_mode = 'off_permissive';
+change master to master_auto_position = 0;
+set global gtid_mode = 'OFF';
+set global enforce_gtid_consistency = 'off'
+start slave;
+
+主从上都依次敲下来
 ```
 
 ## Ⅳ、简单说下搭建过程
