@@ -58,7 +58,7 @@
 
 undo表空间
 - MySQL5.6版本支持独立的Undo表空间
-- innodb_undo_tablespaces
+- innodb_undo_tablespaces(该值8.0开始将会被剔除，不可修改，默认写死，为2)
 
 临时表空间
 
