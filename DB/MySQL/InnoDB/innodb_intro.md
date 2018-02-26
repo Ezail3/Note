@@ -107,35 +107,9 @@ sysbench去测8个文件开16个线程和测1个文件开128个线程，测出�
 - 原因一：元数据信息还是在ibdata1中
 - 原因二：部分索引文件存在于Change Buffer中，目前还是存放于ibdata1文件中
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+查看表空间的元数据信息
+```
+select * from information_schema.innodb_sys_tablespaces;
+```
 
 ## Ⅳ、逻辑存储结构
