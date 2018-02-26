@@ -1,4 +1,6 @@
+---
 # The catalog of Replication
+---
 
 [1、binlog——逻辑复制的基础][1]
 
