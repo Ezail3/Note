@@ -144,15 +144,10 @@ tips:
 
 ## Ⅳ、相关小结
 - flashback是基于binlog的逆操作(逻辑)，Oracle的闪回是基于undo做的(物理)
-
 - 使用flashback，binlog_format必须为row，这个之前binlog章节有简单提到过
-
 - binlog_row_image必须设为full
-
 - flashback仅支持DML操作的闪回，不支持ddl
-
 - 实例开启gtid的情况下，不支持flashback
-
 - 同一事务中的DML语句不仅闪回，语句执行顺序也会倒过来(有兴趣的可以测试，篇幅原因只贴了一个delete操作)
 
 **tips：**
