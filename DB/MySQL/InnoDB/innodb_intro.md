@@ -57,7 +57,7 @@
 - 分区表可以对应多个ibd文件
 
 ③undo表空间
-- MySQL5.6版本支持独立的Undo表空间
+- MySQL5.6版本支持独立的Undo表空间,默认是0，即undo记录在共享表空间中
 - innodb_undo_tablespaces(该值8.0开始将会被剔除，不可修改，默认写死，为2)
 
 ④临时表空间
@@ -73,7 +73,7 @@
 -rw-r----- 1 mysql mysql 50331648 Feb  4 15:06 ib_logfile1    
 -rw-r----- 1 mysql mysql 12582912 Feb 24 10:14 ibtmp1           #临时表空间
 
-两个ib_logfile是循环交替写入的，SSD下尽可能设大，单个文件4G/8G，只有这两个文件不会归档，最老的3.23版本支持归档，因为MySQL有二进制日志所以把这个功能阉割了
+两个ib_logfile是循环交替写入的，SSD下尽可能设大，单个文件4G/8G，设置太小可能会导致脏页刷新时hang住，只有这两个文件不会归档，最老的3.23版本支持归档，因为MySQL有二进制日志所以把这个功能阉割了
 
 [root@VM_0_5_centos data3306]# cd test
 [root@VM_0_5_centos test]# ll
