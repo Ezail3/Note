@@ -175,7 +175,7 @@ MySQL页大小和ORACLE页大小不同的是，MySQL页大小是全局的，一�
 **SpaceID**
 
 - 每个表空间都对应一个SpaceID，而表空间又对应一个ibd文件，那么一个ibd文件也对应一个SpaceID
-- ibdata1 对应的SpaceID为0，每创建一个表空间（ibd文件），SpaceID自增长（全局）
+- ibdata1对应的SpaceID为0，每创建一个表空间（ibd文件），SpaceID自增长（全局）
 
 **PageNumber**
 
@@ -227,3 +227,59 @@ Page Number        |      0     |      1     |      2      |            |     M 
 					   # 每个表空间中，都是从0开始递增，且仅仅是表空间内唯一
 
 ```
+
+- 每次读取Page时，都是通过SpaceID和PageNumber进行读取；
+- 可以简单理解为从表空间的开头读多少个PageNumber * PageSize的字节（偏移）
+- 想成数组，数组的名字就是SpaceID，数组的下标就是PageNumber
+- 在一个SpaceID（ibd文件）中，PageNumber是唯一且自增的
+- 删除表的时候，SpaceID不会回收 ，SpaceID是全局自增长的
+
+**tips：**
+这里的区（extent）的概念已经弱化
+
+在这个例子中，第一个区的PageNumber是（0~63）且这64个页在物理上是连续的；第二个区的PageNumber是（64~127 且这64个页在物理上也是连的
+
+但是（0~63）和（64~127）之间在物理上则不一定是连续的，因为区和区之间在物理上不一定是连续的
+
+### 随便看看
+```
+(root@localhost) [information_schema]> select space, name from information_schema.innodb_sys_tablespaces order by space limit 5;
++-------+---------------------+
+| space | name                |
++-------+---------------------+
+|     2 | mysql/plugin        |
+|     3 | mysql/servers       |
+|     4 | mysql/help_topic    |
+|     5 | mysql/help_category |
+|     6 | mysql/help_relation |
++-------+---------------------+
+5 rows in set (0.00 sec)
+
+(root@localhost) [information_schema]> select name, space, table_id from information_schema.innodb_sys_tables where space=0;
++------------------+-------+----------+
+| name             | space | table_id |
++------------------+-------+----------+
+| SYS_DATAFILES    |     0 |       14 |
+| SYS_FOREIGN      |     0 |       11 |
+| SYS_FOREIGN_COLS |     0 |       12 |
+| SYS_TABLESPACES  |     0 |       13 |
+| SYS_VIRTUAL      |     0 |       15 |
++------------------+-------+----------+
+5 rows in set (0.00 sec)
+
+(root@localhost) [information_schema]> select name, space, table_id from information_schema.innodb_sys_tables where space<>0 order by space limit 5;
++---------------------+-------+----------+
+| name                | space | table_id |
++---------------------+-------+----------+
+| mysql/plugin        |     2 |       16 |
+| mysql/servers       |     3 |       17 |
+| mysql/help_topic    |     4 |       35 |
+| mysql/help_category |     5 |       36 |
+| mysql/help_relation |     6 |       38 |
++---------------------+-------+----------+
+5 rows in set (0.00 sec)
+```
+
+- 独立表空间的table_id和SpaceID一一对应 
+- 共享表空间是多个table_id对应一个SpaceID
+- SpaceID为0的是ibdata1，1这个位置没有，空的
