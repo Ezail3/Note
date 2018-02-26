@@ -14,6 +14,12 @@
 |至今|其他存储引擎已经不再得到Oracle官方的后续开发||
 
 ## Ⅱ、InnoDB重要特性一览
+- Fully ACID（InnoDB默认的Repeat Read隔离级别就支持）
+- Row-level Locking（支持行锁）
+- Multi-version concurrency control（MVCC）（支持多版本并发控制）
+- Foreign key support（支持外键）
+- Automatic deadlock detection（死锁自动检测）
+- High performance、High scalability、High availability（高性能，高扩展，高可用）
 
 ## Ⅲ、物理存储结构
 
