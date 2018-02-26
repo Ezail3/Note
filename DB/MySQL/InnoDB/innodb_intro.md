@@ -114,3 +114,13 @@ select * from information_schema.innodb_sys_tablespaces;
 ```
 
 ## Ⅳ、逻辑存储结构
+|表空间|
+|:-:|
+|内部有多个段对象（Segment）组成|
+|每个段（Segment）由区（Extent）组成|
+|每个区（Extent）由页（Page）组成|
+|每个页里面保存数据（或者叫记录Row）|
+
+
+
+
