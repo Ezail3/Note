@@ -2,7 +2,7 @@
 # InnoDB页压缩技术
 ---
 
-## 上节回顾
+## Ⅰ、上节回顾
 ### 创建表报错
 ```
 (root@localhost) [(none)]> create tablespace ger_space add datafile 'ger_space.ibd' file_block_size=8192;
