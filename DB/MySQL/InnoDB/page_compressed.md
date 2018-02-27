@@ -45,8 +45,8 @@ row_format=compressed,key_block_size=4
 
 可以设置为1 2 4 8 16
 操作须知：
-指定row_format=compressed，则可忽略key_block_size的可选项是1k的值，这时使用默认innodb页的一半，即8kb
-key_block_size的可选项是1k，则可忽略row_format=compressed，会自动启用压缩
+指定row_format=compressed，则可忽略key_block_size的值，这时使用默认innodb页的一半，即8kb
+指定key_block_size的值，则可忽略row_format=compressed，会自动启用压缩
 0代表默认压缩页的值，Innodb页的一半
 key_block_size的值只能小于等于innodb page size，若指定了一个大于innodb page size的值，mysql会忽略这个值然后产生一个警告，这时key_block_size的值是Innodb页的一半
 若设置了innodb_strict_mode=ON，那么指定一个不合法的key_block_size的值是返回报错
