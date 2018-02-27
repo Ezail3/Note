@@ -96,6 +96,7 @@ total 28
 - 可以简单的理解为把多个表的ibd文件合并在一起了
 
 **tips：**
+
 ①删除通用表空间：
 ```
 drop tablespace xxx;
