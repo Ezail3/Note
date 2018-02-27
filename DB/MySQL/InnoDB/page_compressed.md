@@ -1,3 +1,31 @@
+
+
+## 上节回顾
+### 创建表报错
+```
+(root@localhost) [(none)]> create tablespace ger_space add datafile 'ger_space.ibd' file_block_size=8192;
+Query OK, 0 rows affected (0.02 sec)
+
+(root@localhost) [(none)]> create database test;
+Query OK, 1 row affected (0.01 sec)
+
+(root@localhost) [(none)]> create table test_ger(a int) tablespace=ger_space;
+(root@localhost) [(none)]> use test;
+Database changed
+(root@localhost) [test]> create table test_ger(a int) tablespace=ger_space;
+ERROR 1478 (HY000): InnoDB: Tablespace `ger_space` uses block size 8192 and cannot contain a table with physical page size 16384
+```
+### 解决
+```
+(root@localhost) [test]> create table test_ger(a int) tablespace=ger_space row_format=compressed, key_block_size=8;
+Query OK, 0 rows affected (0.14 sec)
+
+amazing!!!(～﹃～)~zZ
+```
+
+
+
+
 压缩表(5.5开始)
 基于页的压缩，每个表的页大小可以不同，压缩算法是L777
 工作原理是：当用户获取数据时，如果压缩的页没有在Innodb_Buffer_Pool缓冲池里，那么会从磁盘加载进去，并且会在Innodb_Buffer_Pool缓冲池里开辟一个新的未压缩的16 KB的数据页来解压缩，为了减少磁盘I/O以及对页的解压操作，在缓冲池里同时存在着被压缩的和未压缩的页。为了给其他需要的数据页腾出空间，缓冲池里会把未压缩的数据页踢出去，而保留压缩的页在内存中，如果未压缩的页在一段时间内没有被访问，那么会直接刷入磁盘中，因此缓冲池中可能有压缩和未压缩的页，也可能只有压缩页。
