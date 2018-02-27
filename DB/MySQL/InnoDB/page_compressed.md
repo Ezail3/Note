@@ -47,7 +47,11 @@ row_format=compressed,key_block_size=4
 ```
 
 **tips：**
+
 虽然SQL语法中写的是row_format=compressed，但是压缩是针对页的，而不是记录，即读页的时候解压，写页的时候压缩，并不会在读取或写入单个记录（row）时就进行解压或压缩操作
+
+### 细说key_block_size
+
 
 ## Ⅲ、透明页压缩
 
