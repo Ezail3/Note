@@ -12,5 +12,5 @@
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/innodb_intro.md
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/general_space.md
-  [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/page_compressed.md
+  [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/page_compressed.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/bp_intro.md
