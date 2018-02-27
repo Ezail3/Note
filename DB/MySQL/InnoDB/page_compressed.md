@@ -75,5 +75,67 @@ key_block_size的值只能小于等于innodb page size，若指定了一个大�
 16k压到8k成功率在80%~90%，但是再压就不能保证了
 
 ### 查看压缩比
+```
+查看压缩比，看information_schema.innodb_cmp表，这个表里面的数据是累加的，是全局信息，没法对应到某一张表，查它之前先查另一张表来清空此表
+select * from information_schema.innodb_cmp_reset;
+把innodb_cmp表中的数据复制过来，并清空innodb_cmp，此处不展示结果
+
+玩起来了
+(root@localhost) [emp]> create table emp_comp like emp;
+Query OK, 0 rows affected (0.26 sec)
+
+(root@localhost) [emp]> alter table emp_comp row_format=compressed,key_block_size=4;
+Query OK, 0 rows affected (0.23 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+(root@localhost) [emp]> show create table emp_comp\G
+*************************** 1. row ***************************
+       Table: emp_comp
+Create Table: CREATE TABLE `emp_comp` (
+  `emp_no` int(11) NOT NULL,
+  `birth_date` date NOT NULL,
+  `first_name` varchar(14) NOT NULL,
+  `last_name` varchar(16) NOT NULL,
+  `gender` enum('M','F') NOT NULL,
+  `hire_date` date NOT NULL,
+  PRIMARY KEY (`emp_no`),
+  KEY `ix_firstname` (`first_name`),
+  KEY `ix_3` (`emp_no`,`first_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4
+1 row in set (0.04 sec)
+
+(root@localhost) [emp]> insert into emp_comp select * from emp;
+Query OK, 300024 rows affected (23.13 sec)
+Records: 300024  Duplicates: 0  Warnings: 0
+
+看压缩比咯
+(root@localhost) [emp]> select * from information_schema.innodb_cmp;
++-----------+--------------+-----------------+---------------+----------------+-----------------+
+| page_size | compress_ops | compress_ops_ok | compress_time | uncompress_ops | uncompress_time |
++-----------+--------------+-----------------+---------------+----------------+-----------------+
+|      1024 |            0 |               0 |             0 |              0 |               0 |
+|      2048 |            0 |               0 |             0 |              0 |               0 |
+|      4096 |        34296 |           27184 |             9 |           7743 |               0 |
+|      8192 |            0 |               0 |             0 |              0 |               0 |
+|     16384 |            0 |               0 |             0 |              0 |               0 |
++-----------+--------------+-----------------+---------------+----------------+-----------------+
+5 rows in set (0.69 sec)
+
+(root@localhost) [emp]> select 27184/34296;    # compress_ops_ok/compress_ops
++-------------+
+| 27184/34296 |
++-------------+
+|      0.7926 |
++-------------+
+1 row in set (0.11 sec)
+压缩比为79.26%
+
+看下物理存储
+[root@VM_0_5_centos emp]# ll -h *.ibd
+-rw-r----- 1 mysql mysql 40M Feb 27 19:01 emp.ibd
+-rw-r----- 1 mysql mysql 20M Feb 27 19:36 emp_comp.ibd
+能看出来表空间小了很多，但是不是79.26%
+```
+
 
 ## Ⅲ、透明页压缩
