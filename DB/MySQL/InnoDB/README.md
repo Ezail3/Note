@@ -6,7 +6,7 @@
 
 [2、通用表空间与页压缩][2]
 
-[3、缓冲池工作原理及后台线程][3]
+[3、缓冲池工作原理及后台线程介绍][3]
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/innodb_intro.md
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/general_space%26%26page_compressed.md
