@@ -1,5 +1,5 @@
 ---
-# 通用表空间与页压缩
+# 通用表空间与InnoDB页压缩
 ---
 
 ## 通用表空间的使用
@@ -115,6 +115,7 @@ ERROR 1478 (HY000): InnoDB: Tablespace `ger_space` uses block size 8192 and cann
 
 ③使用通用表空间须注意备份工具对这块是否支持
 
+## InnoDB页压缩
 
 
 
