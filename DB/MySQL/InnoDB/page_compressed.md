@@ -205,4 +205,12 @@ Size in GB(lower is better)      Insert time in minutes(lower is better)
  16k 16k(c) 8k  4k                 16k 16k(c) 8k  4k
 ```
 
+**结论：**
+
+- inodb_page_size=16k的数据设置key_block_size=16是可以压缩的，且效果比较明显
+- 并不是ey_block_size设置的越小，压缩率就越高，上图中8K和4K的压缩率几乎一样
+- 在启用压缩后，16K和8K的插入性能要好于原来未压缩的插入性能，所以启用了压缩，性能不一定会变差
+- 在I/O Bound（IO密集型）的业务场景下，减少I/O操作的次数对性能提升比较明显
+- key_block_size的设置的值（经验值）通常为innodb_page_size的1/2
+
 ## Ⅲ、透明页压缩
