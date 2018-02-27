@@ -185,4 +185,23 @@ Query OK, 0 rows affected (0.09 sec)
 当只有一个表的时候innodb_cmp等于innodb_cmp_per_index
 ```
 
+### 压缩后的存储和性能
+一个问题，压缩时将key_block_size设置为innodb_page_size有没有意义
+
+答：有意义，key_block_size的设置不影响压缩本身(只和数据本身及压缩算法有关)，只是确定压缩后的数据存放的页大小，varchar、text等数据类型这么压效果还是很明显的
+
+压缩后的存储和性能呢？
+github放图好麻烦，大概弄个差不多的图将就下
+```
+Size in GB(lower is better)      Insert time in minutes(lower is better)
+
+  |                                |              |
+  |    |                           |    |      |  |
+  |    |                           |    |      |  |
+  |    |     |  |                  |    |      |  | 
+  |    |     |  |                  |    |      |  |
+ ——————————————————————           ——————————————————————
+ 16k 16k(c) 8k  4k                 16k 16k(c) 8k  4k
+```
+
 ## Ⅲ、透明页压缩
