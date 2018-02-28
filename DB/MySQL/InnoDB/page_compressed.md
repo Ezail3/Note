@@ -215,6 +215,55 @@ Size in GB(lower is better)      Insert time in minutes(lower is better)
 
 ## Ⅲ、transparent page compression(from 5.7)
 ### 先玩
+```
+(root@localhost) [test]> create table trans_test1(a int) compression='zlib';
+Query OK, 0 rows affected, 1 warning (0.04 sec)
+
+(root@localhost) [test]> create table trans_test2(a int) compression='lz4';
+Query OK, 0 rows affected, 1 warning (0.06 sec)
+
+(root@localhost) [test]> alter table trans_test1 compression='lz4';
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+alter table会很快，因为它不会真的改，只是下次压缩的时候才会用，不会重新压，如果非要马上生效则需要optimize
+
+(root@localhost) [test]> optimize table trans_test1;
++------------------+----------+----------+-------------------------------------------------------------------+
+| Table            | Op       | Msg_type | Msg_text                                                          |
++------------------+----------+----------+-------------------------------------------------------------------+
+| test.trans_test1 | optimize | note     | Table does not support optimize, doing recreate + analyze instead |
+| test.trans_test1 | optimize | status   | OK                                                                |
++------------------+----------+----------+-------------------------------------------------------------------+
+2 rows in set, 1 warning (0.23 sec)
+
+(root@localhost) [test]> show warnings;
++---------+------+---------------------------------------------------------------------------------------------+
+| Level   | Code | Message                                                                                     |
++---------+------+---------------------------------------------------------------------------------------------+
+| Warning |  138 | Punch hole is not supported by the file system. Compression disabled for 'test/trans_test1' |
++---------+------+---------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+错误日志中有下面这段：
+2017-04-22T19:20:14.168298+8:00 0 [Note] InnoDB: PUNCH HOLE support not available
+
+换言之，5.7现在还不能用这个功能，二进制包编译的时候没把PUNCH HOLE编译进去
+
+怎么解决？
+自己编译源码，带上PUNCH HOLE，或者用percona
+
+MySQL8.0的时候就完美availabe，可以去看看，亲测
+create table a ( a int ) compression='lz4';
+Query OK, 0 rows affected (0.03 sec)
+
+tips：5.7.19二进制包已经把做进去了，超赞
+```
+lz4和zlib什么区别？
+
+lz4更快，zlib压缩比更高
+
+通常选择lz4，更快，也能压到一半，够用了，hadoop平台很多数据库默认就用lz4
 
 ### 再看原理
 
