@@ -213,4 +213,9 @@ Size in GB(lower is better)      Insert time in minutes(lower is better)
 - 在I/O Bound（IO密集型）的业务场景下，减少I/O操作的次数对性能提升比较明显
 - key_block_size的设置的值（经验值）通常为innodb_page_size的1/2
 
-## Ⅲ、透明页压缩
+## Ⅲ、transparent page compression(from 5.7)
+### 先玩
+
+### 再看原理
+
+### 性能相关问题
