@@ -76,7 +76,8 @@ key_block_size的值只能小于等于innodb page size，若指定了一个大�
 
 ### 查看压缩比
 ```
-查看压缩比，看information_schema.innodb_cmp表，这个表里面的数据是累加的，是全局信息，没法对应到某一张表，查它之前先查另一张表来清空此表
+查看压缩比，看information_schema.innodb_cmp表
+这个表里面的数据是累加的，是全局信息，没法对应到某一张表，查它之前先查另一张表来清空此表
 select * from information_schema.innodb_cmp_reset;
 把innodb_cmp表中的数据复制过来，并清空innodb_cmp，此处不展示结果
 
