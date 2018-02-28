@@ -3,7 +3,7 @@
 ---
 
 ## 缓冲池介绍
-innodb存储引擎缓冲池 ，类似于oracle的sga，里面放着数据页 、索引页 、change buffer 、自适应哈希 、锁(5.5之前)等内容
+innodb存储引擎缓冲池(buffer pool) ，类似于oracle的sga，里面放着数据页 、索引页 、change buffer 、自适应哈希 、锁(5.5之前)等内容
 
 ```
                                   Clients
@@ -75,3 +75,4 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 
 设置多个缓冲池的时候，必须满足每个池子大于1G才生效，否则，即使my.cnf中设置了innodb_buffer_pool_instances，重启看看是没用的
 
+## buffer pool中热点数据的管理
