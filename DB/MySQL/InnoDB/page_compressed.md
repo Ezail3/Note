@@ -271,8 +271,31 @@ lz4更快，zlib压缩比更高
 这里是是使用了文件系统（filesystem）层中稀疏文件的特性，来达到压缩的目的(文件系统空洞)
 
 **文件的大小与占用空间：**
+```
+[root@VM_0_5_centos ~]# dd of=spare-file bs=1k seek=5120 count=0             #创建数据全为0的临时文件
+0+0 records in
+0+0 records out
+0 bytes (0 B) copied, 4.1441e-05 s, 0.0 kB/s
+[root@VM_0_5_centos ~]# ls -lh spare-file 
+-rw-r--r-- 1 root root 5.0M Feb 28 10:53 spare-file                          #文件大小5M
+[root@VM_0_5_centos ~]# du --block-size=1 spare-file 
+0	spare-file                                                            #文件占用空间0M
+```
 文件中数据连续为0的部分不占用磁盘空间
 
+```
++----------+               +----------+
+|          |               | 4K       |
+|          |               +----------+              +-------+
+|          | zlib          |          | write to     |       |
+|   16K    +--------------->          +-------------->  4K   |
+|          |               | 12k -- 0 | Filesystem   |       |
+|          |               |          |              +-------+
+|          |               |          |
++----------+               +----------+
+orignal page               transparent               Filesystem
+                           compressed
+```
 
 文件系统的空洞特性 ：一个16k的页，前面占了12k，后面填0，
 
