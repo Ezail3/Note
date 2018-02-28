@@ -93,7 +93,7 @@ Flush List 根据oldest_lsn进行排序
 
 缓冲池中的热点是以page为单位来管理，并不是三种List加起来等于总的bp大小，而是Free List + LRU List(Flush List是包含在LRU list里面的)
 - Free List
--- Buffer Pool刚启动时，有一个个16K的空白的页，这些页就存放（链表串联）在Free List中
+buffer Pool刚启动时，有一个个16K的空白的页，这些页就存放（链表串联）在Free List中
 - LRU List   包括LRU和unzip_LRU
 - Flush List 根据oldest_lsn进行排序
 
