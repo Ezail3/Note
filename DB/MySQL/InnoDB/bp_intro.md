@@ -78,10 +78,37 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 设置多个缓冲池的时候，必须满足每个池子大于1G才生效，否则，即使my.cnf中设置了innodb_buffer_pool_instances，重启看看是没用的
 
 ## buffer pool中热点数据的管理
+### buffer pool的组成
 ```
 +----+      +--------------+
 |    |------>     LRU      |
 |free|      |              |
 |    <------|include(flush)|             |
 +----+      +--------------+
+
+Free List  干净的page
+LRU List   包括LRU和unzip_LRU
+Flush List 根据oldest_lsn进行排序
 ```
+
+缓冲池中的热点是以page为单位来管理，并不是三种List加起来等于总的bp大小，而是Free List + LRU List(Flush List是包含在LRU list里面的)
+- Free List
+-- Buffer Pool刚启动时，有一个个16K的空白的页，这些页就存放（链表串联）在Free List中
+- LRU List   包括LRU和unzip_LRU
+- Flush List 根据oldest_lsn进行排序
+
+
+
+LRU List
+当读取一个数据页的时候，就从 Free List 中取出一个页，存入数据，并将该页放入到 LRU List 中
+Flush List
+当LRU List 中的页 第一次 被修改了，就将该页的 指针（page number） 放入了 Flush List （只要修改过，就放入，不管修改几次）
+Flush List 中包含脏页（数据经过修改，但是未刷入磁盘的页）
+Flush list 中存放的不是一个页，而是页的指针（page number）
+
+根据页的单位来管理，并不是三种List加起来就等于总的bp大小，而是Free List + LRU List（Flush List是包含在LRU list里面的）
+Free List 中有五个bp page，数据库刚启动，所有这五个页都在Free List中
+如果磁盘上某个页被读出来要放到bp中，这时候就要向Free List要一个页，将磁盘中内容读进去
+Free List就会给一个页给LRU List中，这个过程中需要一个并发控制，也就是之前说的latch，假设现在有两个线程都读到磁盘上这个页，则都需要问Free List来申请空闲页，谁先来先给谁。latch就是对这三个List进行并发控制访问的。
+假设被读到的页，马上被更新，这个页就叫脏页，会被放入到Flush List列表中，但只是放了一个指针，而不是实际的页
+小结：LRU List存放的是所有已经使用的页，里面既有干净页也有脏页，Flush List中只有指向脏页的指针
