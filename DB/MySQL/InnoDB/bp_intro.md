@@ -53,7 +53,7 @@ innodb存储引擎缓冲池(buffer pool) ，类似于oracle的sga，里面放着
 
 ## Ⅱ、缓冲池性能问题
 
-### 性能线性扩展
+### 2.1 性能线性扩展
 
 假设服务器72核，ht超线程后，144个逻辑核，跑测试按道理144个核应该跑满，如果跑不满，就说明并发有瓶颈，我加核了，却用不上，性能上不去
 
@@ -65,7 +65,7 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 
 核比较多，latch或者并发设计的不好，性能则不能线性扩展 ，而这个bp对于扩展性非常重要，所有的热点的page都在里面，每次访问这些page都要获得bp的latch
 
-### 如何提升上述缓冲池性能问题
+### 2.2 如何提升上述缓冲池性能问题
 
 调整innodb_buffer_pool_instances参数，设置为cpu的数量
 
@@ -78,7 +78,7 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 设置多个缓冲池的时候，必须满足每个池子大于1G才生效，否则，即使my.cnf中设置了innodb_buffer_pool_instances，重启看看是没用的
 
 ## Ⅲ、buffer pool中热点数据的管理
-### buffer pool的组成
+### 3.1 buffer pool的组成
 ```
 +----+      +--------------+
 |    |------>     LRU      |
@@ -114,7 +114,7 @@ Flush list 中存放的不是一个页，而是页的指针（page number）
 
 LRU List存放的是所有已经使用的页，里面既有干净页也有脏页，Flush List中只有指向脏页的指针
 
-### 查看buffer pool的状态
+### 3.2 查看buffer pool的状态
 
 **方法1：show engine innodb status\G**
 ```
