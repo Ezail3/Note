@@ -4,12 +4,12 @@
 
 ## Ⅰ、binlog定义和作用
 
-### 定义
+### 1.1 定义
 记录每次数据库的逻辑操作(包括表结构变更和表数据修改)
 
 包含：binlog文件和index文件
 
-### 作用
+### 1.2 作用
 - 复制：从库读取主库binlog，本地回放实现复制
 - 备份恢复：最近逻辑备份数据+binlog实现最大可能恢复
 - innodb恢复：开启binlog的情况下，innodb事务提交是二阶段提交，发生crash的时候，innodb中事务有两种状态，一种是commit，一种是prepared，对于prepared状态的事务需要根据binlog来判断是提交还是回滚，以此来保证主从数据一致性
@@ -53,12 +53,12 @@ show master status;      查看当前的binlog
 
 ## Ⅳ、binlog内容
 
-### index文件
+### 4.1 index文件
 有序地记录了当前MySQL服务所使用的所用binlog文件
 
 MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
-### binlog文件
+### 4.2 binlog文件
 执行show binlog events in 'xxx'；
 
 查看binlog文件内容，不指定文件默认看第一个binlog文件
@@ -109,7 +109,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 ③每个binlog前四个字节保留，不写数据
 
-### Event类型分析
+### 4.3 Event类型分析
 |Event_type|含义|
 |:-:|:-:|
 |Format_desc|一个binlog文件开始，记录server的版本号和二进制日志的版本号，5.7版本固定占119个字节|
@@ -126,7 +126,7 @@ MySQL运行过程中千万不要骚操作修改index文件，避免出问题
 
 ## Ⅴ、mysqlbinlog工具的使用
 
-### 解析binlog
+### 5.1 解析binlog
 ```
 1、[root@VM_0_5_centos src]# mysqlbinlog bin.000001
 截取一段：
@@ -196,7 +196,7 @@ binlog_format设为row，只知道变化，不知道sql语句，这咋办？
 
 再去看binlog的events，会多一个叫Rows_query的events，它会记录下改变行内容的sql
 
-### 常用参数
+### 5.2 常用参数
 - 根据时间点解析
 ```
 --start-datetime='xxx-xx-xx xx:xx:xx'
@@ -273,12 +273,12 @@ expire_logs_days=N
 
 ## Ⅷ、其他相关问题
 
-### 增量备份怎么做
+### 8.1 增量备份怎么做
 通常MySQL不做增量备份，除非单点，因为MySQL复制本身就是实时在做增量，从库开binlog，在从库上备份binlog即可(flush binary logs;产生新日志，把之前的存下来)
 
 Oracle增量备份还是有用的，万一page发生crash，需要把所有日志重做一遍
 
-### row格式的binlog回放
+### 8.2 row格式的binlog回放
 一个sql插了3条记录，其实插了3次，对应3个write_rows,解析这个东西，变相执行3个sql
 
 一个sql删了3条记录，对应的单个delete_rows，回放的时候先根据主键回放，没有主键就找一个索引来回放，如果一个索引没有，会scan全表
@@ -293,14 +293,14 @@ MySQL5.6推出下面这个参数来指定scan算法可以部分解决无主键�
 
 slave_rows_search_algorithms，默认值是table_scan，index_scan，另一个hash_scan可配，默认没开，也不建议用，因为创建hash表消耗比较大
 
-### flash back
+### 8.3 flash back
 二进制日志能实现一个非常好的功能，用来挽救数据，实现flash back，oracle中还要用到undo
 
 对于insert的event，如果要flash back，就搞成delete，delete搞成insert，update交换前后项即可
 
 听说8.0会支持这个工具，但是现在每家互联网公司都开源自己的工具，实现flashback，但是一定要用row格式的binlog_format
 
-### binlog_cache
+### 8.4 binlog_cache
 binlog默认写入binlog_cache中
 
 **binlog生成的过程**
