@@ -115,3 +115,32 @@ Flush list 中存放的不是一个页，而是页的指针（page number）
 LRU List存放的是所有已经使用的页，里面既有干净页也有脏页，Flush List中只有指向脏页的指针
 
 ### 查看buffer pool的状态
+
+**方法1：show engine innodb status\G**
+```
+...
+----------------------
+BUFFER POOL AND MEMORY
+----------------------
+Total large memory allocated 137428992
+Dictionary memory allocated 303387
+Buffer pool size   8192		#缓冲池中共8192个page
+Free buffers       7772	        #空白页(Free List),线上很可能是0	
+Database pages     420		#在使用的页(LRU List)
+Old database pages 0		#LRU中教冷的page		
+Modified db pages  0		#脏页
+Pending reads      0
+Pending writes: LRU 0, flush list 0, single page 0
+Pages made young 0, not young 0
+0.00 youngs/s, 0.00 non-youngs/s	#yongs表示old变为new
+Pages read 368, created 52, written 322
+0.00 reads/s, 0.00 creates/s, 0.00 writes/s
+No buffer pool page gets since the last printout
+Pages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s
+LRU len: 420, unzip_LRU len: 0
+I/O sum[0]:cur[0], unzip sum[0]:cur[0]
+...
+```
+
+
+**方法2：看两张元数据表**
