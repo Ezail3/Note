@@ -2,7 +2,7 @@
 # 缓冲池工作原理浅析
 ---
 
-## 缓冲池介绍
+## Ⅰ、缓冲池介绍
 innodb存储引擎缓冲池(buffer pool) ，类似于oracle的sga，里面放着数据页 、索引页 、change buffer 、自适应哈希 、锁(5.5之前)等内容
 
 ```
@@ -51,7 +51,7 @@ innodb存储引擎缓冲池(buffer pool) ，类似于oracle的sga，里面放着
 - 当Buffer Pool中没有用户所需要的数据时才去硬盘中获取
 - 通过innodb_buffer_pool_size进行设置总容量，该值设置的越大越好
 
-## 缓冲池性能问题
+## Ⅱ、缓冲池性能问题
 
 ### 性能线性扩展
 
@@ -77,7 +77,7 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 
 设置多个缓冲池的时候，必须满足每个池子大于1G才生效，否则，即使my.cnf中设置了innodb_buffer_pool_instances，重启看看是没用的
 
-## buffer pool中热点数据的管理
+## Ⅲ、buffer pool中热点数据的管理
 ### buffer pool的组成
 ```
 +----+      +--------------+
@@ -113,3 +113,5 @@ Flush list 中存放的不是一个页，而是页的指针（page number）
 **小结：**
 
 LRU List存放的是所有已经使用的页，里面既有干净页也有脏页，Flush List中只有指向脏页的指针
+
+### 查看buffer pool的状态
