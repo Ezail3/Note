@@ -73,7 +73,7 @@ qps达到1w，每秒钟要获得至少1w次latch(就看bp的latch，不谈释放
 
 假设开始这个值是1，现调整为4，原来1个bp管理65536个页，现在4个bp，每个bp管理16384个页，拆成4个分片，将热点打散，latch变少了，并发性能提升了，这是非常常见的内核层对并发调优的手段，经测试，不调整与调整后性能相差30%
 
-**tips：**
+**tips:**
 
 设置多个缓冲池的时候，必须满足每个池子大于1G才生效，否则，即使my.cnf中设置了innodb_buffer_pool_instances，重启看看是没用的
 
@@ -106,7 +106,7 @@ buffer Pool刚启动时，有一个个16K的空白的页，这些页就存放（
 
 假设被读到的页，马上被更新，这个页就叫脏页，会被放入到Flush List列表中，但只是放了一个指针，而不是实际的页（只要修改过，就放入，不管修改几次）
 
-**tips：**
+**tips:**
 
 Flush list 中存放的不是一个页，而是页的指针（page number）
 
@@ -264,7 +264,7 @@ MySQL5.6 开始有办法了
 +-------------------------------------+----------------+
 | innodb_buffer_pool_chunk_size       | 134217728      |
 | innodb_buffer_pool_dump_at_shutdown | ON             |	#在停机时dump出buffer pool中的（space,page）
-| innodb_buffer_pool_dump_now         | OFF            |	#set 一下，表示现在就从buffer pool中dump
+| innodb_buffer_pool_dump_now         | OFF            |	#set一下，表示现在就从buffer pool中dump
 | innodb_buffer_pool_dump_pct         | 25             |	#dump的bp的前百分之多少，是每个buffer pool最近使用的页数，而不是整体，可写到[mysqld-5.7]中
 | innodb_buffer_pool_filename         | ib_buffer_pool |	#dump出的文件的名字
 | innodb_buffer_pool_instances        | 1              |
@@ -325,3 +325,27 @@ Query OK, 0 rows affected (0.00 sec)
 2018-03-02T09:06:40.526294Z 0 [Note] InnoDB: Loading buffer pool(s) from /mdata/data3306/ib_buffer_pool
 2018-03-02T09:06:40.526487Z 0 [Note] InnoDB: Buffer pool(s) load completed at 180302 17:06:40
 ```
+
+**tips:**
+
+注意一下innodb_buffer_pool_dump_pct这个参数，先看下下面这个流程
+```
+(root@localhost) [(none)]> set global innodb_buffer_pool_dump_pct=100;
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> set global innodb_buffer_pool_dump_now = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+[root@VM_0_5_centos data3306]# cat ib_buffer_pool |wc -l
+576
+
+(root@localhost) [(none)]> set global innodb_buffer_pool_dump_pct=20;
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]> set global innodb_buffer_pool_dump_now = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+[root@VM_0_5_centos data3306]# cat ib_buffer_pool |wc -l
+115
+```
+看上去没啥问题，但要注意的是，当你有多个缓冲池的时候，比如有4个，每个里面有100个page，它不是整体来dump前百分之25，而是dump每个缓冲池里面最前面的15个page
