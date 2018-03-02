@@ -54,8 +54,7 @@ read_only = 1
 ```
 
 ## Ⅲ、sql/io高可靠
-
-### sql线程高可靠
+### 3.1 sql线程高可靠
 **背景：**
 
 - 如果将relay_log_info_repository设置为FILE，MySQL会把回放信息记录在一个relay-info.log 的文件中，其中包含SQL线程回放到的Relay_log_name和Relay_log_pos，以及对应的Master的Master_log_name和Master_log_pos
@@ -114,7 +113,7 @@ SET Master_log_pos = Exec_Master_Log_Pos,
 COMMIT;
 ```
 
-### io线程高可靠
+### 3.2 io线程高可靠
 **背景：**
 ```
 +--------+  receive  +-----------+        +----------------+
@@ -159,7 +158,7 @@ io线程挂了
 
 如果 Slave落后Master的时间很多，超过了Master上binlog的保存时间，那Master上对应的binlog就会被删除，Slave的I/O Thread就拉不到数据了，注意监控主从落后的时间
 
-### 小结
+### 3.3 小结
 真正的MySQL复制的高可靠是从 5.6 版本开始的，通过设置以下三个参数确保复制的高可靠(换言，之前的版本复制不可靠很正常)
 ```
 relay_log_recover = 1
@@ -170,7 +169,7 @@ master_info_repository = TABLE
 
 ## Ⅳ、并行复制(Multi-Threaded Slave)
 
-### 背景
+### 4.1 背景
 主从复制延迟是老生常谈的问题了，这里只谈sql线程回放慢的问题，其他因素不考虑
 
 sql线程回放慢最主要的原因就是MySQL 5.5之前都是单线程回放
@@ -216,7 +215,7 @@ slave_preserve_commit_order=1
 这里的并行复制指的是SQL Thread，而非IO Thread
 Waiting for master to send event 这个State在show processlist中只有一个，即只有一个IO Thread
 
-### 理解logical_clock
+### 4.2 理解logical_clock
 这是一种基于组提交的并行复制
 
 如果一批事务在一组里提交，这些事务之间是没有锁冲突的(有锁冲突就要等待了，不可能在一组里提交)
