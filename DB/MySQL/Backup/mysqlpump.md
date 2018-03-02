@@ -4,7 +4,7 @@
 
 ## Ⅰ、功能分析
 
-### 多线程介绍
+### 1.1 多线程介绍
 ```
 		    +-----------+
 		    | mysqlpump |
@@ -30,7 +30,7 @@
 - mysqldump备份时，有个默认队列（default），队列下开N个线程去备份数据库/数据库中的表
 - 支持开多个队列(对应不同库/表)，然后每个队列设置不同线程，进行备份
 
-### 优缺点
+### 1.2 优缺点
 
 **优点：**
 
@@ -42,7 +42,7 @@
 - 无法获取当前备份对应的binlog位置
 - MySQL5.7.11之前的版本不要使用，并行导出和single-transaction是互斥的
 
-### 重要参数
+### 1.3 重要参数
 ```
 --default-parallelism	指定线程数，默认开2个线程进行并发备份
 
@@ -51,7 +51,7 @@
 --set-gtid-purged=OFF   5.7.18后加入的参数，
 ```
 
-## Ⅱ演示一手
+## Ⅱ、演示一手
 ```
 [root@VM_0_5_centos ~]# mysqlpump --single-transaction --set-gtid-purged=OFF --parallel-schemas=2:employees --parallel-schemas=4:dbt3 -B employees dbt3 > /tmp/backup.sql
 mysqlpump: [Warning] Using a password on the command line interface can be insecure.
