@@ -27,12 +27,12 @@ amazing!!!(～﹃～)~zZ
 这里用到一个压缩page的技术，本章我们讨论一下InnoDB的页压缩
 
 ## Ⅱ、传统压缩方式(from 5.5)
-### 原理
+### 2.1 原理
 - 基于页的压缩，每个表的页大小可以不同，压缩算法是L777
 - 当用户获取数据时，如果压缩的页没有在Innodb_Buffer_Pool缓冲池里，那么会从磁盘加载进去，并且会在Innodb_Buffer_Pool缓冲池里开辟一个新的未压缩的16KB的数据页来解压缩，为了减少磁盘I/O以及对页的解压操作，在缓冲池里同时存在着被压缩的和未压缩的页
 - 为了给其他需要的数据页腾出空间，缓冲池里会把未压缩的数据页踢出去，而保留压缩的页在内存中，如果未压缩的页在一段时间内没有被访问，那么会直接刷入磁盘中，因此缓冲池中可能有压缩和未压缩的页，也可能只有压缩页
 
-### 玩两手
+### 2.2 玩两手
 ```
 直接创建
 (root@localhost) [test]> create table comps_test(a int) row_format=compressed, key_block_size=4; 
@@ -56,7 +56,7 @@ key_block_size的值只能小于等于innodb page size，若指定了一个大�
 
 虽然SQL语法中写的是row_format=compressed，但是压缩是针对页的，而不是记录，即读页的时候解压，写页的时候压缩，并不会在读取或写入单个记录（row）时就进行解压或压缩操作
 
-### 细说key_block_size
+### 2.3 细说key_block_size
 - key_block_size的可选项是1k，2k，4k，8k，16k（是页大小，不是比例）
 - 不是将原来innodb_page_size页大小的数据压缩成key_block_size的页大小，因为有些数据可能不能压缩，或者压缩不到那么小
 - 压缩是将原来的页的数据通过压缩算法压缩到一定的大小，然后用key_block_size大小的页去存放
@@ -67,14 +67,14 @@ key_block_size的值只能小于等于innodb page size，若指定了一个大�
 
 不解压也能插入数据，通过在剩余空间直接存放redo log，然后页空间存放满后，再解压，利用redo log更新完成后，最后再压缩存放（此时就没有redo log 了）以此来减少解压和压缩的次数
 
-### 重点须知
+### 2.4 重点须知
 并不是key_block_size越小，压缩比越高，只是页的大小发生了修改
 
 压缩过程，16k的页压8k，先判断能不能压，可以就存为8k，压完大于8k，比如12k，这时候就会存为两个8k
 
 16k压到8k成功率在80%~90%，但是再压就不能保证了
 
-### 查看压缩比
+### 2.5 查看压缩比
 ```
 查看压缩比，看information_schema.innodb_cmp表
 这个表里面的数据是累加的，是全局信息，没法对应到某一张表，查它之前先查另一张表来清空此表
@@ -186,7 +186,7 @@ Query OK, 0 rows affected (0.09 sec)
 当只有一个表的时候innodb_cmp等于innodb_cmp_per_index
 ```
 
-### 压缩后的存储和性能
+### 2.6 压缩后的存储和性能
 一个问题，压缩时将key_block_size设置为innodb_page_size有没有意义
 
 答：有意义，key_block_size的设置不影响压缩本身(只和数据本身及压缩算法有关)，只是确定压缩后的数据存放的页大小，varchar、text等数据类型这么压效果还是很明显的
@@ -215,7 +215,7 @@ Size in GB(lower is better)      Insert time in minutes(lower is better)
 - key_block_size的设置的值（经验值）通常为innodb_page_size的1/2
 
 ## Ⅲ、transparent page compression(from 5.7)
-### 先玩
+### 3.1 先玩
 ```
 (root@localhost) [test]> create table trans_test1(a int) compression='zlib';
 Query OK, 0 rows affected, 1 warning (0.04 sec)
@@ -288,7 +288,7 @@ lz4更快，zlib压缩比更高
 表空间id    page大小    文件系统块大小   文件大小    文件实际分配大小
 ```
 
-### 再看原理(Hole Punch Size)
+### 3.2 再看原理(Hole Punch Size)
 细心的朋友会发现，以上整个过程并未指定页大小
 
 这里是是使用了文件系统（filesystem）层中稀疏文件的特性，来达到压缩的目的(文件系统空洞)
@@ -345,7 +345,7 @@ fwrite(f,page) 这时候这个page在磁盘上就是4k的大小
 
 - TPC的情况下，在bp里面一个disk page对应一个16k的page，因为在第一次读取的时候从磁盘上读(space，page_no)，读完解压，解压完肯定是16k的，在bp里面就只占用一个空间
 
-### 性能相关问题
+### 3.3 性能相关问题
 
 **官方测试：**
 
