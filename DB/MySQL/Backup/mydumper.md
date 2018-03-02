@@ -44,7 +44,7 @@ export LD_LIBRARY_PATH="/usr/local/mysql/lib:$LD_LIBRARY_PATH"
 
 ## Ⅳ、玩两手
 
-### 备份
+### 4.1 备份
 ```
 [root@VM_0_5_centos backup]# mydumper -G -E -R --trx-consistency-only -t 4 -c -B dbt3 -o /mdata/backup
 另开一个会话看下show processlist;可以看到四个线程
@@ -68,7 +68,7 @@ mydumper 参数和其所跟的参数值不能连在一起，不然会报错
 option parsing failed: Error parsing option -r, try --help
 ```
 
-### 分析备份内容
+### 4.2 分析备份内容
 进入备份目录
 ```
 [root@VM_0_5_centos backup]# ll
@@ -146,7 +146,7 @@ INSERT INTO `customer` VALUES
 |.sql|数据文件|
 |-schema-create.sql.gz|创建库| 
 
-### 恢复
+### 4.3 恢复
 恢复使用myloader命令
 ```
 -d 恢复文件目录
