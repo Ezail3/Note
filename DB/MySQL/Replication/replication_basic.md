@@ -4,11 +4,11 @@
 
 ## Ⅰ、复制类型
 
-### 逻辑复制
+### 1.1 逻辑复制
 - 记录每次逻辑操作
 - 主从数据库可以不一致
 
-### 物理逻辑复制
+### 1.2 物理逻辑复制
 - 记录每次对于数据页的操作
 - 主从数据物理严格一致
 - 基于重做日志
@@ -19,7 +19,7 @@
 
 主从两端不仅仅是数据一致，而是物理上的一致，页都是一样的
 
-### 复制选型与对比
+### 1.3 复制选型与对比
 简单的主从环境，两边同样的表，space_id不用一样，只要保证数据在逻辑内容上一致，物理上不用一样。也就是说，一张表的数据一致就行，不要求这些数据对应的表空间里面内容也一致
 
 **Oracle的优势**
@@ -57,7 +57,7 @@ MySQL的事务一次commit分成三个阶段
 
 三个步骤都是group commit的，所以性能不会差
 
-### 基本原理
+### 3.1 基本原理
 ```
  +-----+                      +-----+  
  |  M  |                      |  S  | 
@@ -93,7 +93,7 @@ MySQL的事务一次commit分成三个阶段
 - relay log在SQL线程回放完成后就会被删除（默认），而 binlog 不会（由expire_logs_days控制）
 - relay log 可以通过设置 relay_log_purge=0，使得relay Log不被删除（MHA中不希望被purge），需要通过外部的脚本进行删除
 
-### 动手搭一个
+### 3.2 动手搭一个
 炒鸡简单，虽然没mongodb简单，但比oracle简单太多了(redis的cluster比mongodb都简单)，搞起来！！！
 
 |步骤|操作|
@@ -166,7 +166,7 @@ Query OK, 0 rows affected (0.00 se
 Slave_IO_Running和Slave_SQL_Running这两个指标都为YES,表示目前的复制的状态是正常的
 ```
 
-### 细说show slave status\G
+### 3.3 细说show slave status\G
 ```
 (root@172.16.0.10) [test]> show slave status\G
 *************************** 1. row ***************************
@@ -243,8 +243,8 @@ master-retry-count      重连次数
 当从库发现从主库上无法获得更多的数据了，就会等待slave-net-timeout时间，然后将IO thread置为no状态，接着开始尝试重建建立连接，每次建立失败之后等待master-connect-retry时间，一直重试master-retry-count次
 ```
 
-## Ⅲ、主从架构中常用的操作
-### 主
+## Ⅳ、主从架构中常用的操作
+### 4.1 主
 ```
 查看从服务器列表
 (root@172.16.0.10) [test]> show slave hosts;
@@ -265,7 +265,7 @@ master-retry-count      重连次数
 1 row in set (0.00 sec)
 ```
 
-### 从
+### 4.2 从
 ```
 show slave status;
 
@@ -274,7 +274,7 @@ change master to
 start/stop slave
 ```
 
-### 报错处理
+### 4.3 报错处理
 ```
 模拟报错：
 从：
@@ -304,7 +304,7 @@ Query OK, 0 row affected (0.00 sec)
 关于这个跳过当前报错后面会专门具体展开分析，暂时了解这么多即可
 ```
 
-## Ⅳ、read_only与super_read_only
+## Ⅴ、read_only与super_read_only
 如果在slave机器上对数据库进行修改或者删除，会导致主从的不一致，需要对Slave机器设置为read_only = 1 ，让slave提供只读操作。
 
 **tips：**
