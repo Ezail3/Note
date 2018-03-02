@@ -18,5 +18,5 @@
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/general_space.md
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/page_compressed.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/bp_intro.md
-  [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/compressed_page_in_bp.md
-  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/backgound_threads.md
+  [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/compressed_page_in_bp.md
+  [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/backgound_threads.md
