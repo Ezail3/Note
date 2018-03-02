@@ -11,13 +11,13 @@
 
 到5.7版本，在原来半同步的基础上又出了一种半同步，叫无损复制,所以目前有两种半同步模式如下：
 
-### semi-syncreplication
+### 1.1 semi-syncreplication
 - 至少有一个从机收到binlog再返回
 - 减少数据丢失风险
 - 不能完全避免数据丢失
 - MySQL5.5版本开始支持
 
-### lossless semi-syncreplication
+### 1.2 lossless semi-syncreplication
 - 二进制日志先写远端
 - 可保证数据完全不丢失
 - MySQL5.7版本开始支持
@@ -142,7 +142,7 @@ Query OK, 0 rows affected (0.00 sec)
 - slave追上后又会自动切回半同步
 
 ## Ⅲ、半同步原理浅析（两种模式）
-### semi-sync replication
+### 3.1 semi-sync replication
 半同步复制,一个事务提交（commit)时，在InnoDB层的commit log步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示收到了binlog ）后，方可继续下一个事务
 
 若在一定时间内（timeout）内没有收到ACK，则切换为异步模式，具体流程如下：
@@ -186,7 +186,7 @@ step3：
 insert into a values(1);hang住咯
 新开个线程，但可以看到这条记录
 ```
-### loss less semi-sync replication
+### 3.2 loss less semi-sync replication
 无损复制，一个事务提交（commit）时，在server层的write binlog步骤后，Master节点需要收到至少一个Slave节点回复的ACK（表示收到了binlog ）后，才能继续下一个事务
 
 如果在一定时间内（timeout）内没有收到ACK ，则切换为异步模式 ，具体流程如下：
@@ -221,7 +221,7 @@ rpl_semi_sync_master_wait_for_slave_count = 1
 
 主从还未切换，主恢复的话，在两种复制模式下，主从的数据都是最终一致的（配置是crash_safe的）
 
-### 小结对比
+### 3.3 小结对比
 
 |半同步模式|等待ack时间点|数据一致性|
 |:-:|:-:|:-:|
@@ -244,7 +244,7 @@ rpl_semi_sync_master_wait_for_slave_count
 ```
 
 ## Ⅳ、几种复制的性能对比
-### 先吹两手
+### 4.1 先吹两手
 异步复制和半同步复制(无损)的性能差多少？
 - 只读的情况下，性能一样，因为没有产生二进制日志，谈不上主从
 - oltp脚本（14个select，4个update）跑，性能其实也差不多
@@ -264,7 +264,7 @@ rpl_semi_sync_master_wait_for_slave_count
 
 所以，5.7不用gr就能保证主从数据一致性，只是gr在做选主的话变成全自动了，不用mha，但它现在也还有一些明显的限制
 
-### 再吹一手
+### 4.2 再吹一手
 从facebook测试结果看，after_commit性能很差，而无损复制比异步性能还好，为什么呢？
 - 就等待ACK回包问题上，其实两种复制的开销是一样的，没有区别，都是网络的等待开销
 - after_commit，主上一个事务等待提交的时候，不影响其他事务提交，性能一般
