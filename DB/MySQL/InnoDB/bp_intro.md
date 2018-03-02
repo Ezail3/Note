@@ -192,7 +192,7 @@ MySQL中使用了midpoint LRU算法来管理LRU List
 +-----------------------------------------------+--------------------------------+
 
 原理：
-LRU中new page和old page是在一个链表上的，想像成排队，访问多的就从mid point排到了链表的前面，冷的页就慢慢被挤到了old page中，如果old中的数据继续被多次访问，还是会回到new中
+LRU中new page和old page是在一个链表上的，访问多的就从mid point排到了链表的前面，冷的页就慢慢被挤到了old page中，如果old中的数据继续被多次访问，还是会回到new中
 
 四种情况：
 1 : mid --> new 
@@ -265,7 +265,7 @@ MySQL5.6 开始有办法了
 | innodb_buffer_pool_chunk_size       | 134217728      |
 | innodb_buffer_pool_dump_at_shutdown | ON             |	#在停机时dump出buffer pool中的（space,page）
 | innodb_buffer_pool_dump_now         | OFF            |	#set 一下，表示现在就从buffer pool中dump
-| innodb_buffer_pool_dump_pct         | 25             |	#dump的bp的前百分之多少，是每个buffer pool文件，而不是整体，可写到[mysqld-5.7]中
+| innodb_buffer_pool_dump_pct         | 25             |	#dump的bp的前百分之多少，是每个buffer pool最近使用的页数，而不是整体，可写到[mysqld-5.7]中
 | innodb_buffer_pool_filename         | ib_buffer_pool |	#dump出的文件的名字
 | innodb_buffer_pool_instances        | 1              |
 | innodb_buffer_pool_load_abort       | OFF            |
@@ -325,22 +325,3 @@ Query OK, 0 rows affected (0.00 sec)
 2018-03-02T09:06:40.526294Z 0 [Note] InnoDB: Loading buffer pool(s) from /mdata/data3306/ib_buffer_pool
 2018-03-02T09:06:40.526487Z 0 [Note] InnoDB: Buffer pool(s) load completed at 180302 17:06:40
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-关闭数据库之前把bp中的space和page_no给dump出来(不是整个bp，5.6还没正式发布的时候就是dump所有)，重启的时候会把dump出来的内容load进bp,dump出来是无序的，load之前根据space和pageno进行排序，load是异步的，对bp基本没影响。
-set global innodb_buffer_pool_dump_now=1;现在就触发dump
-默认dump出来的文件叫ib_buffer_pool ，一个文本文件
-innodb_buffer_pool_dump_pct  默认25，姜总用的40，5.6是全量dump，5.7可以dump出bp的前百分之多少，写到中
