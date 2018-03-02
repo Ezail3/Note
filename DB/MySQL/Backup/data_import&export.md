@@ -16,7 +16,7 @@
 
 做这种操作需要file权限
 
-### 导出
+### 1.1 导出
 ```
 select * into outfile 'xxx.data' from xxx    #sql语句随便写
 fields terminated by 'string'                指定分隔符，默认tab
@@ -44,7 +44,7 @@ Query OK, 3 rows affected (0.01 sec)
 
 导出的数据和mysqldump不太一样，打开来看会发现里面是每个列的数据，tab来分割
 
-### 导入
+### 1.2 导入
 ```
 create table xxx like xxx;
 数据文件里不是sql语句，用loaddata导入,不用额外解析insert，比较快
@@ -94,7 +94,7 @@ tips：ignore N lines 可指定不到如前N行
 
 地理空间的数据类型，列比较特殊，geometry的列，导出的话是一个经度和纬度，导入的时候就要用set a = geometry(a,b);
 
-### load data的缺点
+### 1.3 load data的缺点
 - 针对文本文件，会有限制，比如一篇博客，有很多字符，逗号，tab，等等
 
 其实可以搞成十六进制，再导入进去，但是比较烦
