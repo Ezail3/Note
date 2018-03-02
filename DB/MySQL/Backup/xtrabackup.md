@@ -9,7 +9,7 @@
 
 ## xtrabackup安装使用
 
-### 安装
+### 2.1 安装
 ```
 [root@VM_0_5_centos src]# yum install perl-DBD-MySQL
 不安装这个备份会报错：Failed to connect to MySQL server: DBI connect
@@ -24,7 +24,7 @@
 [root@VM_0_5_centos src]# source /etc/profile
 ```
 
-### 玩一手
+### 2.2 玩一手
 ```
 [root@VM_0_5_centos src]# innobackupex --compress --compress-threads=8 --stream=xbstream -S /tmp/mysql.sock --parallel=4 /data/backup > backup.xbstream
 建议用-S连接，默认走socket，不用-S可能报连不上
@@ -160,7 +160,7 @@ xtrabackup: Transaction log of lsn (10304786) to (10304795) was copied.
 
 ## Ⅳ、xtrabackup备份恢复
 
-### 查看备份文件
+### 4.1 查看备份文件
 由于我这里用的是流文件的方式备份的，所以要先打开流文件
 ```
 [root@VM_0_5_centos backup]# xbstream -x < backup.xbstream
@@ -240,7 +240,7 @@ encrypted = N
 xtrabackup_logfile                                                # 持续备份的redo，直接看不了
 ```
 
-### 恢复一手瞅瞅
+### 4.2 恢复一手瞅瞅
 ```
 step1: 应用日志，将backup恢复
 [root@VM_0_5_centos mdata]# innobackupex --apply-log backup
@@ -266,7 +266,7 @@ Starting MySQL. SUCCESS!
 
 ## Ⅴ、其他相关问题
 
-### 增量备份
+### 5.1 增量备份
 --incremental-history-name=name 可使用改参数做增量备份
 
 但非常不建议用这个增量备份功能，性能特别差
@@ -277,14 +277,14 @@ percona有个参数可以监控哪些页改动了，所以不用去扫之前的�
 
 要做增量，用二进制日志的机制来做即可
 
-### 指定库表备份
+### 5.2 指定库表备份
 同样不推荐这种玩法，强烈建议完整备份
 
 备份原理是备份所有表空间(ibd)，不完整备份的话，可能会遇到各种问题
 
 比如备份了a库,没备份b库，用这个备份恢复后在b库下面创建一个和之前同名的表就创建不了
 
-### 远程备份
+### 5.3 远程备份
 ```
 innobackupex --compress --compress-threads=8 --stream=xbstream --user=root --parallel=4 ./ | ssh root@192.168.1.192 "xbstream -x -C /data/www/mysql/backup"
 ```
