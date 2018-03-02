@@ -12,7 +12,7 @@
 
 [5、缓冲池中的压缩页相关分析][5]
 
-[6、初识后台线程][6]
+[6、初始后台线程][6]
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/innodb_intro.md
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/general_space.md
