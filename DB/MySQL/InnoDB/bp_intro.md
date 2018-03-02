@@ -224,8 +224,123 @@ set global innodb_old_blocks_time=1;
 
 如果开发有个scan操作，就需要设置一下，操作完后再改回来。最好的方案是放到从机上，避免扫描语句污染LRU
 
-**tips:**
+**tips：**
 
 ①如果一个page中10条记录一次读，读这十条记录的时候这个页就会被锁成只读，那其他线程对这个页的操作就不被允许了，数据库是一个并发系统，这是不合理的，这样读一个页hold住锁的时间会长，所以是每读一条记录去读一次页，然后马上释放，把读到的位置————游标(这个游标和数据库的游标不是一回事)保存下来，下次再要读的时候，从打开这个游标继续读，但是位置可能会变化，所以会重新去读这个页，以此确保各个线程公平调度
 
 ②myisam缓存data是交给操作系统缓存 ，和pg一样
+
+### 3.4 buffer pool的预热
+
+**背景：**
+
+在MySQL启动后（MySQL5.6之前），Buffer Pool中页的数据是空的，需要大量的时间才能把磁盘中的页读入到内存中，导致启动后的一段时间性能很差
+
+例：启动的时候load
+
+64GB BP 10M/s读取 100min
+
+预热策略：将LRU列表dump出来，通过较顺序读取的方式预热50M~200M
+
+预热方法：
+
+select count(1) from table force index(primary)
+
+select count(1) from index
+
+**说明：**
+
+上面两种方法很痤。并没有预热真正的热点数据，只是把数据读进来了。粒度非常粗，比如你数据100G，bp10G，那真正的热点很大部分不是热点数据
+
+网易试过共享内存来做，数据库重启bp不清，不过操作系统重启了也就白搭了
+
+**好办法：**
+
+MySQL5.6 开始有办法了
+```
+(root@172.16.0.10) [(none)]> show variables like 'innodb_buffer_pool%';
++-------------------------------------+----------------+
+| Variable_name                       | Value          |
++-------------------------------------+----------------+
+| innodb_buffer_pool_chunk_size       | 134217728      |
+| innodb_buffer_pool_dump_at_shutdown | ON             |	#在停机时dump出buffer pool中的（space,page）
+| innodb_buffer_pool_dump_now         | OFF            |	#set 一下，表示现在就从buffer pool中dump
+| innodb_buffer_pool_dump_pct         | 25             |	#dump的bp的前百分之多少，是每个buffer pool文件，而不是整体，可写到[mysqld-5.7]中
+| innodb_buffer_pool_filename         | ib_buffer_pool |	#dump出的文件的名字
+| innodb_buffer_pool_instances        | 1              |
+| innodb_buffer_pool_load_abort       | OFF            |
+| innodb_buffer_pool_load_at_startup  | ON             |	#启动时加载dump的文件，恢复到buffer pool中
+| innodb_buffer_pool_load_now         | OFF            |	#set一下，表示现在加载 dump的文件
+| innodb_buffer_pool_size             | 1879048192     |
++-------------------------------------+----------------+
+10 rows in set (0.00 sec)
+```
+- 关闭数据库之前把bp中的space和page_no给dump出来(不是整个bp，5.6还没正式发布的时候就是dump所有)
+- 重启的时候会把dump出来的内容load进bp,dump出来是无序的，load之前根据space和pageno进行排序，load是异步的，返回速度还可以，对bp基本没影响
+- dump的越多，启动的越慢
+- 频繁dump会导致Buffer Pool中的数据越来越少，是因为设置了innodb_buffer_pool_dump_pct，默认25，姜总用的40
+- 如果做了高可用，可以定期dump，然后将该dump的文件传送到slave上，然后直接load（slave上的（Space，Page）和Master上的 大致相同 ）
+
+简单演示一把：
+```
+(root@localhost) [(none)]> set global innodb_buffer_pool_dump_now = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+(root@localhost) [(none)]>  show status like 'Innodb_buffer_pool_dump_status';
++--------------------------------+--------------------------------------------------+
+| Variable_name                  | Value                                            |
++--------------------------------+--------------------------------------------------+
+| Innodb_buffer_pool_dump_status | Buffer pool(s) dump completed at 180302 16:57:45 |
++--------------------------------+--------------------------------------------------+
+1 row in set (0.00 sec)
+
+进入数据目录
+[root@VM_0_5_centos data3306]# ll *pool
+-rw-r----- 1 mysql mysql 604 Mar  2 16:59 ib_buffer_pool
+[root@VM_0_5_centos data3306]# head ib_buffer_pool 
+0,568
+0,567
+0,566
+0,565
+0,278
+0,564
+0,563
+0,562
+164,3
+164,2
+
+停止服务
+[root@VM_0_5_centos data3306]# mysqld_multi stop 3306
+截取错误日志
+2018-03-02T09:01:10.292549Z 0 [Note] InnoDB: Starting shutdown...
+2018-03-02T09:01:10.392851Z 0 [Note] InnoDB: Dumping buffer pool(s) to /mdata/data3306/ib_buffer_pool
+2018-03-02T09:01:10.393059Z 0 [Note] InnoDB: Buffer pool(s) dump completed at 180302 17:01:10
+
+启动服务，加载热数据
+[root@VM_0_5_centos data3306]# mysqld_multi start 3306
+(root@localhost) [(none)]> set global innodb_buffer_pool_load_now = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+再截取错误日志
+2018-03-02T09:06:40.526294Z 0 [Note] InnoDB: Loading buffer pool(s) from /mdata/data3306/ib_buffer_pool
+2018-03-02T09:06:40.526487Z 0 [Note] InnoDB: Buffer pool(s) load completed at 180302 17:06:40
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+关闭数据库之前把bp中的space和page_no给dump出来(不是整个bp，5.6还没正式发布的时候就是dump所有)，重启的时候会把dump出来的内容load进bp,dump出来是无序的，load之前根据space和pageno进行排序，load是异步的，对bp基本没影响。
+set global innodb_buffer_pool_dump_now=1;现在就触发dump
+默认dump出来的文件叫ib_buffer_pool ，一个文本文件
+innodb_buffer_pool_dump_pct  默认25，姜总用的40，5.6是全量dump，5.7可以dump出bp的前百分之多少，写到中
