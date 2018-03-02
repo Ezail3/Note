@@ -4,7 +4,7 @@
 
 ## Ⅰ、mysqldump的简单使用与注意点
 
-### 基本参数
+### 1.1 基本参数
 只备份innodb，用不了几个参数，记住下面几个即可，其他的没什么卵用
 ```
 -A 备份所有的database
@@ -30,7 +30,7 @@ mysqldump --single-transaction test a > backup.sql       备份test库下的a表
 mysqldump --single-transaction test a -w "c=12"> backup.sql
 ```
 
-### 其他参数
+### 1.2 其他参数
 ```
 --lock-tables(-l)
 在备份中依次锁住所有表，一般用于myisam备份，备份时数据库只能提供读操作，以此来保证数据一致性，该参数和--single-transaction是互斥的，所以实例中既存在myisam又存在innodb则，只能使用该参数
@@ -38,7 +38,7 @@ mysqldump --single-transaction test a -w "c=12"> backup.sql
 --lock-all-tables(-x)
 比上面的参数力度更大，备份时将整个实例锁住
 ```
-### 重点
+### 1.3 重点
 ```
 --single-transaction 
 必须加（一个事务中导出数据，确保产生一致性的备份数据）
@@ -53,7 +53,7 @@ master-data=2
 
 ## Ⅱ、mysqldump实现原理剖析
 
-### 开glog嗖哈一把看看嘛(*^__^*) 
+### 2.1 开glog嗖哈一把看看嘛(*^__^*) 
 ```
 session 1:
 (root@localhost) [(none)]> truncate mysql.general_log;
@@ -124,7 +124,7 @@ root@localhost on  using Socket
 /*!40103 SET TIME_ZONE='+00:00' */                                                                  
 ```
 
-### mysqldump流程小结
+### 2.2 mysqldump流程小结
 |-|操作|解析|
 |:-:|:-:|:-:|
 |step1|flush tables/flush tables with read lock|将实例锁成只读|
@@ -134,7 +134,7 @@ root@localhost on  using Socket
 |step5|select xxx|备份数据|
 |step6|ROLLBACK TO SAVEPOINT sp/RELEASE SAVEPOINT sp|结束一张表备份，回到sp|
 
-### 关键点细说
+### 2.3 关键点细说
 
 - start transaction with consistent snapshot
 
