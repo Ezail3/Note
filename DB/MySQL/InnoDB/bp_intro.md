@@ -132,7 +132,7 @@ Modified db pages  0		#脏页
 Pending reads      0
 Pending writes: LRU 0, flush list 0, single page 0
 Pages made young 0, not young 0
-0.00 youngs/s, 0.00 non-youngs/s	#yongs表示old变为new
+0.00 youngs/s, 0.00 non-youngs/s	#youngs表示old变为new
 Pages read 368, created 52, written 322
 0.00 reads/s, 0.00 creates/s, 0.00 writes/s
 No buffer pool page gets since the last printout
@@ -140,7 +140,41 @@ Pages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s
 LRU len: 420, unzip_LRU len: 0
 I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 ...
+
+如果设置了多个buffer pool
+找到individual buffer pool info 看每一个bp的情况
 ```
 
-
 **方法2：看两张元数据表**
+先说下，这东西比较大，看起来不是很方便，不太推荐
+```
+root@localhost) [(none)]> SELECT 
+    ->     pool_id,
+    ->     pool_size,
+    ->     free_buffers,
+    ->     database_pages,
+    ->     old_database_pages,
+    ->     modified_database_pages
+    -> FROM
+    ->     information_schema.innodb_buffer_pool_stats\G
+*************************** 1. row ***************************
+                pool_id: 0
+              pool_size: 8192
+           free_buffers: 7772
+         database_pages: 420
+     old_database_pages: 0
+modified_database_pages: 0
+1 row in set (0.00 sec)
+
+(root@localhost) [(none)]> SELECT                                                                         
+    ->     space, page_number, newest_modification, oldest_modification
+    -> FROM
+    ->     information_schema.innodb_buffer_page_lru
+    -> LIMIT 1\G
+*************************** 1. row ***************************
+              space: 0
+        page_number: 7
+newest_modification: 5330181742		#该页最近一次（最新）被修改的LSN值
+oldest_modification: 0			#该页在Buffer Pool中第一次被修改的LSN值，FLush List是根据该值进行排序的,该值越小，表示该页应该最先被刷新
+1 row in set (0.01 sec)
+```
