@@ -142,7 +142,7 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 ...
 
 如果设置了多个buffer pool
-找到individual buffer pool info 看每一个bp的情况
+找到individual buffer pool info看每一个bp的情况
 ```
 
 **方法2：看两张元数据表**
