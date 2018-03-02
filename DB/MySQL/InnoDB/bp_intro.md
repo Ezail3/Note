@@ -106,6 +106,25 @@ buffer Pool刚启动时，有一个个16K的空白的页，这些页就存放（
 
 假设被读到的页，马上被更新，这个页就叫脏页，会被放入到Flush List列表中，但只是放了一个指针，而不是实际的页（只要修改过，就放入，不管修改几次）
 
+如何查看缓冲池中的脏页？
+```
+SELECT 
+    pool_id,
+    lru_position,
+    space,
+    page_number,
+    table_name,
+    oldest_modification,
+    newest_modification
+FROM
+    information_schema.INNODB_BUFFER_PAGE_LRU
+WHERE
+    oldest_modification <> 0
+        AND oldest_modification <> newest_modification;
+
+结果集为空，则表示没有脏页，线上小心，不要乱执行，此sql消耗比较大
+```
+
 **tips:**
 
 Flush list 中存放的不是一个页，而是页的指针（page number）
