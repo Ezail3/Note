@@ -375,7 +375,7 @@ Query OK, 0 rows affected (0.00 sec)
 随机预读
 innodb_random_read_ahead
 线性预读
-innodb_read_ahead_threshold
+innodb_read_ahead_threshold    该参数目前缺省值为0
 ```
 - 线性预读放到以extent为单位，而随机预读放到以extent中的page为单位
 - 线性预读是将下一个extent提前读取到buffer pool中，随机预读是将当前extent中的剩余的page提前读取到buffer pool中
