@@ -370,11 +370,12 @@ Query OK, 0 rows affected (0.00 sec)
 看上去没啥问题，但要注意的是，当你有多个缓冲池的时候，比如有4个，每个里面有100个page，它不是整体来dump前百分之25，而是dump每个缓冲池里面最前面的15个page
 
 ## 异步读
-发现全表扫描，如果已经扫了100个页，会异步读取后面的100个页，即使你没读到,这块由下面两个参数控制
+发现全表扫描，如果已经扫了一部分内容，innodb会异步读取这部分内容后面的一部分，即使你没读到
 ```
 随机预读
 innodb_random_read_ahead
 线性预读
 innodb_read_ahead_threshold
 ```
-线性预读放到以extent为单位，而随机预读放到以extent中的page为单位。线性预读着眼于将下一个extent提前读取到buffer pool中，而随机预读着眼于将当前extent中的剩余的page提前读取到buffer pool中
+- 线性预读放到以extent为单位，而随机预读放到以extent中的page为单位
+- 线性预读是将下一个extent提前读取到buffer pool中，随机预读是将当前extent中的剩余的page提前读取到buffer pool中
