@@ -7,7 +7,7 @@
 - gtid = server_uuid + transaction_id
 - server_uuid是全局唯一的，5.6开始才有，表示当前实例的uuid，保存在数据目录中的auto.conf文件中
 - transaction_id是自增的
-- gtid的作用是替代filename+ + position
+- gtid的作用是替代filename + position
 
 主：show master status;
 ```
