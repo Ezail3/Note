@@ -16,6 +16,7 @@
 
 [7、闪回工具——flashback][7]
 
+[8、binlog备份服务——binlog server][8]
 
 
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/backup_intro.md
@@ -25,3 +26,4 @@
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/mysqlpump.md
   [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/data_import%26export.md
   [7]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/flashback.md
+  [8]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/Backup/binlog_server.md
