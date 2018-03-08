@@ -194,7 +194,7 @@ binlog_format设为row，只知道变化，不知道sql语句，这咋办？
 
 设置参数binlog_rows_query_log_events=1  建议打开
 
-再去看binlog的events，会多一个叫Rows_query的events，它会记录下改变行内容的sql
+再去看binlog的events，会多一个叫Rows_query的event，它会记录下改变行内容的sql
 
 ### 5.2 常用参数
 - 根据时间点解析
