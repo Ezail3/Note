@@ -53,3 +53,6 @@ Create Table: CREATE TABLE `sbtest1` (
 1 row in set (0.00 sec)
 ```
 一路摸下来，果然是个压缩表
+
+## Ⅱ、压缩页在bp中的存储
+这块其实之前章节中 已简单提过，这里详细分析一下
