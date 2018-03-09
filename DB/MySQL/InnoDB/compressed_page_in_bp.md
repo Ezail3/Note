@@ -56,3 +56,28 @@ Create Table: CREATE TABLE `sbtest1` (
 
 ## Ⅱ、压缩页在bp中的存储
 这块其实之前章节中 已简单提过，这里详细分析一下
+```
+(root@localhost) [(none)]> show engine innodb status\G
+...
+----------------------
+BUFFER POOL AND MEMORY
+----------------------
+Total large memory allocated 137428992
+Dictionary memory allocated 127372
+Buffer pool size   8191
+Free buffers       7759
+Database pages     632
+Old database pages 253
+Modified db pages  0
+Pending reads      0
+Pending writes: LRU 0, flush list 0, single page 0
+Pages made young 0, not young 0
+0.00 youngs/s, 0.00 non-youngs/s
+Pages read 597, created 35, written 42
+0.00 reads/s, 0.00 creates/s, 0.00 writes/s
+No buffer pool page gets since the last printout
+Pages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s
+LRU len: 632, unzip_LRU len: 4          压缩页在bp中的长度是4
+I/O sum[0]:cur[0], unzip sum[0]:cur[0]
+...
+```
