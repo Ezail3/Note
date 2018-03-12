@@ -87,3 +87,27 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 - 向Free List中申请空闲的页，如果没有空闲页，则向LRU List申请页，如果LRU满了，则找LRU中最后的一个页，如果最后的页是脏页，则做flush操作，最后得到一个空白的页（16K）
 - 该16k的空白页，就给8K的压缩页使用，这样就多出一个8K的空间 ，该空间会移到8K的Free List中去
 - 如果有一个4K的压缩页，就把8K的Free list中的空白页给他用，然后多余的4K的空间移到4K的Free List中去
+
+```
+                                         ^  + 
+                                         |  |
+                                     read|  |Update 
+                                         |  | 
+            +--------+                +--+--v---+
+            |        | decompressed   |     16K |   
+            |   4K   +---------------->         | 
+Buffer Pool |        |                |         |        
+            |   redo <---+update      |         | 
+			|        | no need        |         | 
+			+--+--^--+ decompressed   +---------+ 
+			   |  |
++-------------------------------------------------------------+ 
+               |  |
+  flush to disk|  |read from disk
+               |  | 
+			 +-v--+-+ Disk 
+			 |      | 
+			 |  4K  | 
+			 |      | 
+			 +------+
+```
