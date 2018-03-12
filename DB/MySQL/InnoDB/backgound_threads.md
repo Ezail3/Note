@@ -38,3 +38,12 @@
 innodb_read_io_threads    不建议调整，读取基本上很少是异步，调大没太大意义
 
 innodb_write_io_threads   可以调大一点，因为数据库写入都是异步的，默认是4，调成8或者16，特别是ssd的情况下
+
+## Ⅱ、脏页刷新
+innodb_io_capacity参数控制
+
+每十秒钟刷新这个参数个页，这是一个全量的刷新，如果量特别大也可能是每秒钟刷这么多，可以理解为每秒钟刷的最多的量
+
+innodb_io_capacity_max 5.7中出来的参数作额外控制，一般设为前者的double
+
+这里先了解即可，如需深入，需要展开master thread的工作原理，请参考《MySQL技术内幕——InnoDB存储引擎》第2版
