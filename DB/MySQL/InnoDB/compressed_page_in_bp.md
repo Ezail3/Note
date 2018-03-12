@@ -98,16 +98,16 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
             |   4K   +---------------->         | 
 Buffer Pool |        |                |         |        
             |   redo <---+update      |         | 
-			|        | no need        |         | 
-			+--+--^--+ decompressed   +---------+ 
-			   |  |
+            |        | no need        |         | 
+	    +--+--^--+ decompressed   +---------+ 
+	       |  |
 +-------------------------------------------------------------+ 
                |  |
   flush to disk|  |read from disk
                |  | 
-			 +-v--+-+ Disk 
-			 |      | 
-			 |  4K  | 
-			 |      | 
-			 +------+
+	     +-v--+-+ Disk 
+	     |      | 
+	     |  4K  | 
+	     |      | 
+	     +------+
 ```
