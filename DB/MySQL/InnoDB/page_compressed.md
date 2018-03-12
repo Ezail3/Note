@@ -33,25 +33,13 @@ amazing!!!(～﹃～)~zZ
 - 该16k的空白页，就给8K的压缩页使用，这样就多出一个8K的空间 ，该空间会移到8K的Free List中去
 - 如果有一个4K的压缩页，就把8K的Free list中的空白页给他用，然后多余的4K的空间移到4K的Free List中去
 
-- 这种压缩是基于页的，每个表的页大小可以不同，压缩算法是L777
-- 当用户获取数据时，如果压缩的页没有在Innodb_Buffer_Pool缓冲池里，那么会从磁盘加载进去，并且会在Innodb_Buffer_Pool缓冲池里开辟一个新的未压缩的16KB的数据页来解压缩，为了减少磁盘I/O以及对页的解压操作，在缓冲池里同时存在着被压缩的和未压缩的页
-- 为了给其他需要的数据页腾出空间，缓冲池里会把未压缩的数据页踢出去，而保留压缩的页在内存中，如果未压缩的页在一段时间内没有被访问，那么会直接刷入磁盘中，因此缓冲池中可能有压缩和未压缩的页，也可能只有压缩页
-
-
-通过上述方式，不同大小的页可以在同一个Buffer Pool中使用（可以简单的认为Free List是按照页大小来进行划分的）
-不能根据页大小来划分缓冲池，缓冲池中页的大小就是固定的大小（等于innodb_page_size ）
-LRU List和Flush List不需要按照页大小划分，都是统一的innodb_page_size大小
-
-
-
-
 ```
                                          ^  + 
                                          |  |
                                      read|  |Update 
                                          |  | 
             +--------+                +--+--v---+
-            |        | decompressed   |     16K |   
+            |        | decompressed   |   16K   |   
             |   4K   +---------------->         | 
 Buffer Pool |        |                |         |        
             |   redo <---+update      |         | 
@@ -69,26 +57,62 @@ Buffer Pool |        |                |         |
 	     +------+
 ```
 
+**注意点：**
 
+- 这种压缩是基于页的，每个表的页大小可以不同，压缩算法是L777
+- 当用户获取数据时，如果压缩的页没有在Innodb_Buffer_Pool缓冲池里，那么会从磁盘加载进去，并且会在Innodb_Buffer_Pool缓冲池里开辟一个新的未压缩的16KB的数据页来解压缩，为了减少磁盘I/O以及对页的解压操作(更快地查询)，在缓冲池里同时存在着被压缩的和未压缩的页
+- 为了给其他需要的数据页腾出空间，缓冲池里会把未压缩的数据页踢出去，而保留压缩的页在内存中，如果未压缩的页在一段时间内没有被访问，那么会直接刷入磁盘中，因此缓冲池中可能有压缩和未压缩的页，也可能只有压缩页
+- 压缩页保留的原因是为了在更新数据的时候，将redo添加到压缩页的空闲部分，如果要刷回磁盘，可以直接将该压缩页刷回去，如果该页被写满，则做一次reorganize操作（在此之前也要做解压），真的写满了才做分裂
 
+**缺点：**
 
+- 压缩页占用了Buffer Pool的空间，对于热点数据来说，相当于内存小了，可能造成性能下降（热点空间变小）
+- 所以在开启了压缩后，Buffer Pool的空间要相应增大
+- 如果启用压缩后节省的磁盘IO能够抵消掉Buffer Pool空间变小所带来的性能下降，那整体性能还是会上涨，所以Buffer Pool要尽可能大
 
+### 2.2 玩两手
+```
+直接创建
+(root@localhost) [test]> create table comps_test(a int) row_format=compressed, key_block_size=4; 
+Query OK, 0 rows affected (0.04 sec)
 
+对已存在的表启用压缩，并且页大小为4k，
+alter table xxxxx
+engine=innodb
+row_format=compressed,key_block_size=4
 
+可以设置为1 2 4 8 16
+操作须知：
+指定row_format=compressed，则可忽略key_block_size的值，这时使用默认innodb页的一半，即8kb
+指定key_block_size的值，则可忽略row_format=compressed，会自动启用压缩
+0代表默认压缩页的值，Innodb页的一半
+key_block_size的值只能小于等于innodb page size，若指定了一个大于innodb page size的值，mysql会忽略这个值然后产生一个警告，这时key_block_size的值是Innodb页的一半
+若设置了innodb_strict_mode=ON，那么指定一个不合法的key_block_size的值是返回报错
+```
 
+**tips：**
 
+虽然SQL语法中写的是row_format=compressed，但是压缩是针对页的，而不是记录，即读页的时候解压，写页的时候压缩，并不会在读取或写入单个记录（row）时就进行解压或压缩操作
 
+### 2.3 细说key_block_size
+- key_block_size的可选项是1k，2k，4k，8k，16k（是页大小，不是比例）
+- 不是将原来innodb_page_size页大小的数据压缩成key_block_size的页大小，因为有些数据可能不能压缩，或者压缩不到那么小
+- 压缩是将原来的页的数据通过压缩算法压缩到一定的大小，然后用key_block_size大小的页去存放
+- 比如原来的innodb_page_size大小是16K，现在的key_block_size设置为8K,某表的数据大小是24k,原先使用2个16k的页存放,压缩后数据从24k变为18k，由于现在的key_block_size=8k，所以需要3个8K的页存放压缩后的18k数据，多余的空间可以留给下次插入或者更新
+- 压缩比和设置的key_block_size没有关系，压缩比看数据本身和算法，key_block_size仅仅是设置存放压缩数据的页大小
 
+**tips：**
 
+不解压也能插入数据，通过在剩余空间直接存放redo log，然后页空间存放满后，再解压，利用redo log更新完成后，最后再压缩存放（此时就没有redo log 了）以此来减少解压和压缩的次数
 
+### 2.4 重点须知
+并不是key_block_size越小，压缩比越高，只是页的大小发生了修改
 
+压缩过程，16k的页压8k，先判断能不能压，可以就存为8k，压完大于8k，比如12k，这时候就会存为两个8k
 
+16k压到8k成功率在80%~90%，但是再压就不能保证了
 
-
-
-
-
-## Ⅰ、看看buffer pool中的压缩页嘛
+### 25 查看压缩页
 ```
 (root@localhost) [(none)]> SELECT                                                                                                                                                            
     ->     table_name,
@@ -141,8 +165,7 @@ Create Table: CREATE TABLE `sbtest1` (
 ```
 一路摸下来，果然是个压缩表
 
-## Ⅱ、压缩页在bp中的存储
-这块其实之前章节中 已简单提过，这里详细分析一下
+再看下压缩页在bp中的存储
 ```
 (root@localhost) [(none)]> show engine innodb status\G
 ...
@@ -169,92 +192,7 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 ...
 ```
 
-
-
-- 压缩页在内存中保留
-- 被压缩的页需要在Buffer Pool中解压
-- 原来的压缩页保留在Buffer Pool中
-- 缺点是压缩页占用了Buffer Pool的空间，对于热点数据来说，相当于内存小了，可能造成性能下降（热点空间变小）
-- 所以在开启了压缩后，Buffer Pool的空间要相应增大
-- 如果启用压缩后节省的磁盘IO能够 抵消 掉Buffer； Pool“空间变小”所带来的性能下降，那整体性能还是会上涨；
-- 启用压缩的前提是，内存尽可能的大
-- 压缩页保留的原因是为了在更新数据的时候，将redo添加到压缩页的空闲部分，如果要刷回磁盘，可以直接将该压缩页刷回去，如果该页被写满，则做一次 reorganize操作（在此之前也要做解压），真的写满了才做分裂
-
-1. 保留压缩页是为了更快的刷回磁盘
-2. 解压的页是为了更快的查询
-透明压缩则没有上述压缩页的问题，因为压缩是文件系统层的，对MySQL是透明的
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 2.2 玩两手
-```
-直接创建
-(root@localhost) [test]> create table comps_test(a int) row_format=compressed, key_block_size=4; 
-Query OK, 0 rows affected (0.04 sec)
-
-对已存在的表启用压缩，并且页大小为4k，
-alter table xxxxx
-engine=innodb
-row_format=compressed,key_block_size=4
-
-可以设置为1 2 4 8 16
-操作须知：
-指定row_format=compressed，则可忽略key_block_size的值，这时使用默认innodb页的一半，即8kb
-指定key_block_size的值，则可忽略row_format=compressed，会自动启用压缩
-0代表默认压缩页的值，Innodb页的一半
-key_block_size的值只能小于等于innodb page size，若指定了一个大于innodb page size的值，mysql会忽略这个值然后产生一个警告，这时key_block_size的值是Innodb页的一半
-若设置了innodb_strict_mode=ON，那么指定一个不合法的key_block_size的值是返回报错
-```
-
-**tips：**
-
-虽然SQL语法中写的是row_format=compressed，但是压缩是针对页的，而不是记录，即读页的时候解压，写页的时候压缩，并不会在读取或写入单个记录（row）时就进行解压或压缩操作
-
-### 2.3 细说key_block_size
-- key_block_size的可选项是1k，2k，4k，8k，16k（是页大小，不是比例）
-- 不是将原来innodb_page_size页大小的数据压缩成key_block_size的页大小，因为有些数据可能不能压缩，或者压缩不到那么小
-- 压缩是将原来的页的数据通过压缩算法压缩到一定的大小，然后用key_block_size大小的页去存放
-- 比如原来的innodb_page_size大小是16K，现在的key_block_size设置为8K,某表的数据大小是24k,原先使用2个16k的页存放,压缩后数据从24k变为18k，由于现在的key_block_size=8k，所以需要3个8K的页存放压缩后的18k数据，多余的空间可以留给下次插入或者更新
-- 压缩比和设置的key_block_size没有关系，压缩比看数据本身和算法，key_block_size仅仅是设置存放压缩数据的页大小
-
-**tips：**
-
-不解压也能插入数据，通过在剩余空间直接存放redo log，然后页空间存放满后，再解压，利用redo log更新完成后，最后再压缩存放（此时就没有redo log 了）以此来减少解压和压缩的次数
-
-### 2.4 重点须知
-并不是key_block_size越小，压缩比越高，只是页的大小发生了修改
-
-压缩过程，16k的页压8k，先判断能不能压，可以就存为8k，压完大于8k，比如12k，这时候就会存为两个8k
-
-16k压到8k成功率在80%~90%，但是再压就不能保证了
-
-### 2.5 查看压缩比
+### 2.6 查看压缩比
 ```
 查看压缩比，看information_schema.innodb_cmp表
 这个表里面的数据是累加的，是全局信息，没法对应到某一张表，查它之前先查另一张表来清空此表
@@ -519,7 +457,7 @@ fwrite(f,page) 这时候这个page在磁盘上就是4k的大小
 
 **4、新老压缩算法对比：**
 
-- TPC是调用punch hole，只是写入之前先压缩填0，简洁高效；老的压缩需要指定key_block_size，老算法数据在bp中会占两个空间，一种是压缩的版本，一种是非压缩的版本，更新一个page，两种page都要更新，需要额外开销，较复杂，所以性能时好时坏
+- TPC是调用文件系统层的punch hole，只是写入之前先压缩填0，简洁高效；老的压缩需要指定key_block_size，老算法数据在bp中会占两个空间，一种是压缩的版本，一种是非压缩的版本，更新一个page，两种page都要更新，需要额外开销，较复杂，所以性能时好时坏
 
 - TPC的情况下disk每个页大小16k，实际上可能只有4k，8k或者12k，管理依然根据16k来管理
 
