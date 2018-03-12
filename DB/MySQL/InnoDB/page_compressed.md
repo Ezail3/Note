@@ -2,8 +2,8 @@
 # InnoDB页压缩技术
 ---
 
-## Ⅰ、上节回顾
-### 创建表报错
+## Ⅰ、想起一个报错
+### 1.1 创建表报错
 ```
 (root@localhost) [(none)]> create tablespace ger_space add datafile 'ger_space.ibd' file_block_size=8192;
 Query OK, 0 rows affected (0.02 sec)
@@ -17,7 +17,7 @@ Database changed
 (root@localhost) [test]> create table test_ger(a int) tablespace=ger_space;
 ERROR 1478 (HY000): InnoDB: Tablespace `ger_space` uses block size 8192 and cannot contain a table with physical page size 16384
 ```
-### 解决
+### 2.1 解决
 ```
 (root@localhost) [test]> create table test_ger(a int) tablespace=ger_space row_format=compressed, key_block_size=8;
 Query OK, 0 rows affected (0.14 sec)
