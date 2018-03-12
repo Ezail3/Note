@@ -88,6 +88,13 @@ I/O sum[0]:cur[0], unzip sum[0]:cur[0]
 - 该16k的空白页，就给8K的压缩页使用，这样就多出一个8K的空间 ，该空间会移到8K的Free List中去
 - 如果有一个4K的压缩页，就把8K的Free list中的空白页给他用，然后多余的4K的空间移到4K的Free List中去
 
+通过上述方式，不同大小的页可以在同一个Buffer Pool中使用（可以简单的认为Free List是按照页大小来进行划分的）
+不能根据页大小来划分缓冲池，缓冲池中页的大小就是固定的大小（等于innodb_page_size ）
+LRU List和Flush List不需要按照页大小划分，都是统一的innodb_page_size大小
+
+
+
+
 ```
                                          ^  + 
                                          |  |
