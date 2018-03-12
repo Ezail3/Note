@@ -14,9 +14,15 @@
 
 [6、初识后台线程][6]
 
+[7、checkpoint分析][7]
+
+[8、InnoDB基本特性][8]
+
   [1]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/innodb_intro.md
   [2]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/general_space.md
   [3]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/page_row.md
   [4]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/bp_intro.md
   [5]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/page_compressed.md
   [6]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/backgound_threads.md
+  [7]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/checkpoint.md
+  [8]:https://github.com/Ezail3/Note/blob/master/DB/MySQL/InnoDB/basic_character.md
