@@ -376,7 +376,9 @@ MySQL8.0的时候就完美availabe，可以去看看，亲测
 create table a ( a int ) compression='lz4';
 Query OK, 0 rows affected (0.03 sec)
 
-tips：5.7.19二进制包已经把做进去了，超赞
+tips：
+5.7.19二进制包已经把做进去了，超赞
+文件系统必须为ext4或者xfs，ext3用不了
 ```
 lz4和zlib什么区别？
 
