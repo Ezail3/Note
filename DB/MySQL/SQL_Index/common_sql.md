@@ -52,19 +52,26 @@
 ### 1.2 缺失范围
 解决思路：做一个新列，将a列每条记录往前挪一位，新列-原列>1则说明不连续，此时原列+1即缺失范围的开始，新列-1则为缺失范围的结束
 ```
-SELECT 
-    cur + 1 start_range, next - 1 end_range
-FROM
-    (SELECT 
-        a cur,
-            (SELECT 
-                    MIN(a)
-                FROM
-                    t b
-                WHERE
-                    b.a > a.a) next
-    FROM
-        t a) r
-WHERE
-    next - cur > 1;
+(root@localhost) [test]> SELECT 
+    ->     cur + 1 start_range, next - 1 end_range
+    -> FROM
+    ->     (SELECT 
+    ->         a cur,
+    ->             (SELECT 
+    ->                     MIN(a)
+    ->                 FROM
+    ->                     t b
+    ->                 WHERE
+    ->                     b.a > a.a) next
+    ->     FROM
+    ->         t a) r
+    -> WHERE
+    ->     next - cur > 1;
++-------------+-----------+
+| start_range | end_range |
++-------------+-----------+
+|           4 |        44 |
+|          50 |        98 |
++-------------+-----------+
+2 rows in set (0.00 sec)
 ```
