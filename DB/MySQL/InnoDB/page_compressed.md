@@ -378,6 +378,7 @@ Query OK, 0 rows affected (0.03 sec)
 
 tips：
 5.7.19二进制包已经把做进去了，超赞
+经测试，貌似ext3不支持punch hole
 ```
 lz4和zlib什么区别？
 
