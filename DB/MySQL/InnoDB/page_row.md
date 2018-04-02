@@ -2,7 +2,8 @@
 # 页与记录相关内容
 ---
 
-## 关于主键的一个小测试
+## Ⅰ、无主键的一个小测试
+### 1.1 表上存在唯一键
 ```
 (root@localhost) [test]> show create table test_key\G
 *************************** 1. row ***************************
@@ -85,3 +86,50 @@ CHARACTER_MAXIMUM_LENGTH: 4
 3 rows in set (0.00 sec)
 看到b列被作为主键
 ```
+
+### 1.2 表上无唯一键
+当表中未显式指定主键，且没有非空唯一键时，系统会自定义一个主键（6个字节，int型，全局，隐藏）
+```
+(root@localhost) [test]> show create table test_key3\G                                                    
+*************************** 1. row ***************************
+       Table: test_key3
+Create Table: CREATE TABLE `test_key3` (
+  `a` int(11) DEFAULT NULL,
+  `b` int(11) DEFAULT NULL,
+  `c` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+
+(root@localhost) [test]> select * from test_key3;
++------+------+------+
+| a    | b    | c    |
++------+------+------+
+|    1 |    2 |    3 |
+|    4 |    5 |    6 |
+|    7 |    8 |    9 |
++------+------+------+
+3 rows in set (0.00 sec)
+
+(root@localhost) [test]> select *, _rowid from test_key3;
+ERROR 1054 (42S22): Unknown column '_rowid' in 'field list'
+(root@localhost) [test]> select * from information_schema.columns where table_name='test_key3' and column_key='pri'\G
+Empty set (0.00 sec)
+
+(root@localhost) [test]> desc test_key3;                                                                  
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| a     | int(11) | YES  |     | NULL    |       |
+| b     | int(11) | YES  |     | NULL    |       |
+| c     | int(11) | YES  |     | NULL    |       |
++-------+---------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+由上可见，这种情况下_rowid我们是看不了的，对我们透明
+```
+
+**tips：**
+假设有两张表都使用了系统定义的主键，则系统定义的主键的id并不是表内单调递增的，而是全局递增
+
+该系统的rowid是定义在ibdata1.ibd中的sys_rowid中，全局自增
+
+6个字节表示的数据量为 2^48 ，通常意义上是够用的
