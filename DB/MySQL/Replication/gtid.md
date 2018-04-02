@@ -1,7 +1,3 @@
----
-# 基于GTID的复制
----
-
 ## Ⅰ、GTID的介绍
 - global transaction id identifier 全局事务id
 - gtid = server_uuid + transaction_id
@@ -27,10 +23,9 @@ Executed_Gtid_Set: d565cde8-0573-11e8-89b2-525400a4dac1:1
 ```
 
 **tips：**
-
 如果做了A和B做了双主，B上一直在同步A上数据，这时候在B上写入一个事务
 
-A上看下Executed_Gtid_set，会发现又两个值
+A上看下Executed_Gtid_set，会发现有两个值
 
 一个是自己做主当前的事务号，一个是同步的从上的事务号
 
@@ -51,7 +46,7 @@ a是master，b c d是slave，a挂了，b做主，c d做change master
 
 此时c d 上的pos却还是a上面的pos，和b没有对应关系，文件名，文件大小，position完全不一样，change不起来
 
-使用gtid的话，b上保存这c和d回放的位置G_a、G_b(b是通过选举出来的，保存着最多的日志)
+使用gtid的话，b上保存着c和d回放的位置G_a、G_b(b是通过选举出来的，保存着最多的日志)
 
 ## Ⅲ、gtid配置
 ```
@@ -63,7 +58,6 @@ enforce-gtid-consistency = 1
 ```
 
 **tips：**
-
 - MySQL5.6必须开启参数log_slave_updates,5.7.6开始无需配置
 - MySQL5.6升级到gtid模式需要停机重启
 - MySQL5.7.6版本开始可以在线升级gtid模式
@@ -104,12 +98,12 @@ start slave;
 
 用mydumper备份，看下metadata文件，找到gitd：xxxxxx:x-xxx
 
-这玩意等同于mysqdump备份文件中set @@global.gtid_purged='xxxx:x-xxx';
+这玩意等同于mysqldump备份文件中set @@global.gtid_purged='xxxx:x-xxx';
 
 表示这部分gtids对应的事务已经在备份中了，slave在还原备份后复制时，需要跳过这些gtids
 
 ```
-reset master;   清空@@GLOBAL.GTID_EXECUTED，不然执行下一步会宝座
+reset master;   清空@@GLOBAL.GTID_EXECUTED，不然执行下一步会报错
 SET @@GLOBAL.GTID_PURGED = '找出来的位置'
 以上操作mysqldump出来的文件导入无需操作，mydumper要手动，因为myloader不执行这个
 
@@ -119,7 +113,6 @@ start slave;
 ```
 
 **tips:**
-
 - binlog文件中会有两个关于gtid的event——Previous_gtids和Gtid
 - 通过扫描binlog中的gtid值，可以知道gtid与filename-pos的对应关系，如果binlog很大，扫描量也很大，所以用Previous_gtid来记录之前一个binlog文件中最大的gtid
 - 如果要找的gtid比previous_gtids大，就扫描当前文件，反之扫之前的文件，依次类推
